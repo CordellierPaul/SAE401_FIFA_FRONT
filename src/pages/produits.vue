@@ -18,6 +18,7 @@
 
     const categories = ref()
     const categoriesNom = ref([])
+    const categoriesId = ref([])
 
     const pays = ref()
     const paysNom = ref([])
@@ -74,6 +75,7 @@
 
         categories.value.forEach(categorie => {
             categoriesNom.value.push(categorie.categorieNom);
+            categoriesId.value.push(categorie.categorieId);
         });
 
         // pour avoir les pays
@@ -126,7 +128,7 @@
             filtreRequestList.value.push([colorisNom.value.indexOf(element)+1,"colId"])
         });
         optionsCategoriesChecked.value.forEach(element => {
-            filtreRequestList.value.push([categoriesNom.value.indexOf(element)+1,"catId"])
+            filtreRequestList.value.push([categoriesId.value[categoriesNom.value.indexOf(element)],"catId"])
         });
         optionsPaysChecked.value.forEach(element => {
             filtreRequestList.value.push([paysId.value[paysNom.value.indexOf(element)], "paysId"])
