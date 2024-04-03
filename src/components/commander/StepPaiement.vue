@@ -54,8 +54,8 @@
 
         <div :class="adresseInputClass" class="*:my-2 w-full">
             <select class="select select-bordered w-full" placeholder="Pays">
-                <option >France</option>
-                <option >Belgique</option>
+                <option>France</option>
+                <option>Belgique</option>
                 <option>Suisse</option>
                 <option>Italie</option>
             </select>

@@ -6,17 +6,22 @@ import { useStorage } from '@vueuse/core'
 const useCompteStore = defineStore("compte", {
     state: () => ({
         compteId: useStorage("compteId", null),
+        utilisateurId: useStorage("utilisateurId", null),
         token: useStorage("token", ""),
         isConnected: useStorage("isConnected", false) 
     }),
     actions: {
         connect(compteId, token) {
             this.compteId = compteId
+            
+            // TODO ici : trouver userid
+
             this.token = token
             this.isConnected = true
         },
         disconnect() {
             this.compteId = null
+            this.utilisateurId = null
             this.token = ""
             this.isConnected = false
         }

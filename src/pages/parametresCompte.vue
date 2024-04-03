@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
 
 const compteStore = useCompteStore()
