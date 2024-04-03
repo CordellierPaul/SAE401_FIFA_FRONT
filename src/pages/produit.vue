@@ -52,7 +52,7 @@
 
             </div>
 
-            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner])">AJOUTER AU PANIER</button>
+            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner], image)">AJOUTER AU PANIER</button>
             
             
             <p class="font-semibold">Description</p>
@@ -114,7 +114,7 @@
     
     const panierStore = usePanierStore()
 
-    function ajoute(produit, variante, stock) {
+    function ajoute(produit, variante, stock, image) {
         if(stock == null){
             modal_taille_non_choisis.showModal();
             return;
@@ -123,8 +123,7 @@
             modal_quantite_max_choisis.showModal();
             return;
         }
-        panierStore.add(produit, variante, stock)
-        console.log(stock)
+        panierStore.add(produit, variante, stock, image)
     }
     const router = useRouter();
     const route = useRoute();
