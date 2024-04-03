@@ -14,7 +14,6 @@ function deconnexion() {
 function panierPlus(index) {
   let quantiteStock = panierStore.getStocks[index].quantiteStockee
   let quantiteAchat = panierStore.getQuantites[index]
-  console.log(quantiteStock)
   if(quantiteStock == quantiteAchat){
     modal_plus_de_stock.showModal()
     return;
@@ -147,9 +146,7 @@ function panierPlus(index) {
                       <p>Taille : {{ panierStore.getStocks[index-1].tailleStockee.tailleLibelle}}</p>
                       <div class="flex justify-between items-center">
                         <p class="text-base font-bold">{{ ((panierStore.getVariantes[index-1].varianteProduitPrix * (1- panierStore.getVariantes[index-1].varianteProduitPromo))* panierStore.getQuantites[index-1]).toFixed(2) }}</p>
-                        <!-- <select class="bg-base-200 font-bold w-7">
-                          <option v-for="index in 10">{{ index }}</option>
-                        </select> -->
+                        
                         <button class="btn btn-circle h-3 w-3" @click="panierStore.baisseQuantite(panierStore.getStocks[index-1])">-</button>
                         <p  class="bg-base-200 font-bold w-7">{{panierStore.getQuantites[index-1]}}</p>
                         <button class="btn btn-circle h-3 w-3" @click="panierPlus(index-1)">+</button>

@@ -31,13 +31,16 @@
             </div>
 
 
-            <p class="font-bold mt-4">TAILLE</p>
-            <div class="flex flex-wrap gap-1 py-2">
-                <span  v-for="(stock, index) in VarianteStocks" :key="index" >
-                    <button v-if="stock.varianteProduitId == variantesProduit[variantesSelectionne].varianteProduitId" 
-                    v-bind:class="{'btn btn-square btn-outline' : stock.quantiteStockee !=0, 'btn btn-square btn-outline btn-disabled':stock.quantiteStockee ==0}">{{ stock.tailleStockee.tailleLibelle }}</button>
+            <div  class="flex gap-1">
+                <p class="font-bold">TAILLE :</p>
+                <p v-if="VarianteStocks[TailleSelectionner]">{{ VarianteStocks[TailleSelectionner].tailleStockee.tailleLibelle }}</p>
+            </div>
+            <div id="container" class="flex flex-wrap gap-2 p-2">
+                <div  v-for="(stock, index) in VarianteStocks" :key="index" >
+                    <button v-if="stock.varianteProduitId == variantesProduit[variantesSelectionne].varianteProduitId" @click="TailleSelectionner = index"
+                    v-bind:class="{'btn btn-square btn-outline flex gap-2' : stock.quantiteStockee !=0, 'btn btn-square btn-outline btn-disabled':stock.quantiteStockee ==0}">{{ stock.tailleStockee.tailleLibelle }}</button>
                                       
-                </span>
+                </div>
             </div>
 
 
@@ -52,7 +55,7 @@
 
             </div>
 
-            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner], image)">AJOUTER AU PANIER</button>
+            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner], image, coloris[variantesSelectionne])">AJOUTER AU PANIER</button>
             
             
             <p class="font-semibold">Description</p>
@@ -113,8 +116,15 @@
     import { isProxy, toRaw } from 'vue';
     
     const panierStore = usePanierStore()
+    const router = useRouter();
+    const route = useRoute();
 
-    function ajoute(produit, variante, stock, image) {
+    const props = defineProps({
+        
+    });
+
+    //Pour ajouter le produit dans le panier
+    function ajoute(produit, variante, stock, image, coloris) {
         if(stock == null){
             modal_taille_non_choisis.showModal();
             return;
@@ -123,14 +133,8 @@
             modal_quantite_max_choisis.showModal();
             return;
         }
-        panierStore.add(produit, variante, stock, image)
+        panierStore.add(produit, variante, stock, image, coloris)
     }
-    const router = useRouter();
-    const route = useRoute();
-
-    const props = defineProps({
-        
-    });
 
     // Pour retourner à la page précédente
 
@@ -278,9 +282,6 @@
             t = await stocks.json();
             t.forEach(stock => {
                 VarianteStocks.value.push(stock)
-                // console.log(stock.quantiteStockee)
-                // console.log(stock.tailleStockee)
-                // VarianteStocks.value.push(stock);
             });
         }
 
