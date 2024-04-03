@@ -4,11 +4,25 @@
     import StepInscription from '@/components/commander/StepInscription.vue';
     import StepLivraison from '@/components/commander/StepLivraison.vue';
     import StepPaiement from '@/components/commander/StepPaiement.vue';
-    import { ref, watchEffect } from 'vue';
+    import { onMounted, ref, watchEffect } from 'vue';
     
     const panierStore = usePanierStore()
-
+    
+    const livraisons = ref([])
+    const livraisonChoisis = ref(0)
     const step = ref('inscription')
+
+    
+    async function fetchLivraisons() {
+        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/livraison ", {
+            method: "GET",
+            mode: "cors"
+        })
+
+        livraisons.value = await paysResponse.json()
+    }
+
+    onMounted(fetchLivraisons)
 
     function scrollTop(){
 
@@ -31,7 +45,7 @@
         <div class="flex items-center  flex-col w-7/12 bg-base-200 p-2 mr-1" >
             
             <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" ></StepInscription>
-            <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'"></StepLivraison>
+            <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis"></StepLivraison>
             <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'"></StepPaiement>
         </div>
 
@@ -66,7 +80,10 @@
                     <div>
                         <div class="flex justify-between">
                             <p>Livraison</p>
-                            <p>Gratuit</p>
+                            <div v-if="livraisons.length >1" class="flex gap-1">
+                                <p>{{livraisons[livraisonChoisis].livraisonType}}</p>
+                                <p>({{livraisons[livraisonChoisis].livraisonPrix}}€)</p>
+                            </div>
                         </div>
                     </div>
                     <div class="divider"></div> 
@@ -76,7 +93,7 @@
                                 <p class="text-xl font-bold">TOTAL</p>
                                 <p class="mx-1">(TVA incluse)</p>
                             </div>
-                            <p class="text-2xl font-semibold">{{ panierStore.sousTotal }} €</p>
+                            <p v-if="livraisons.length >1" class="text-2xl font-semibold">{{ parseFloat(panierStore.sousTotal) + livraisons[livraisonChoisis].livraisonPrix}} €</p>
                         </div>
                     </div>
                 </div>
