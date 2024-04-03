@@ -52,7 +52,7 @@
 
             </div>
 
-            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner])">AJOUTER AU PANIER</button>
+            <button class="btn btn-block btn-accent text-white my-5" @click="ajoute(produit, variantesProduit[variantesSelectionne], VarianteStocks[TailleSelectionner], image)">AJOUTER AU PANIER</button>
             
             
             <p class="font-semibold">Description</p>
@@ -114,7 +114,7 @@
     
     const panierStore = usePanierStore()
 
-    function ajoute(produit, variante, stock) {
+    function ajoute(produit, variante, stock, image) {
         if(stock == null){
             modal_taille_non_choisis.showModal();
             return;
@@ -123,8 +123,7 @@
             modal_quantite_max_choisis.showModal();
             return;
         }
-        panierStore.add(produit, variante, stock)
-        console.log(stock)
+        panierStore.add(produit, variante, stock, image)
     }
     const router = useRouter();
     const route = useRoute();
@@ -178,7 +177,7 @@
     });
 
     async function fetchProduit() {
-        const firstResponse = await fetch(`https://apififa.azurewebsites.net/api/produit/getbyid/${route.params.id}`, {
+        const firstResponse = await fetch(`https://apififa2.azurewebsites.net/api/produit/getbyid/${route.params.id}`, {
             method: "GET",
             mode: "cors"
         })
@@ -217,7 +216,7 @@
         let c
 
         for (const variante of variantesProduit.value) {
-            r = await fetch(`https://apififa.azurewebsites.net/api/coloris/getbyid/${variante.colorisId}`, {
+            r = await fetch(`https://apififa2.azurewebsites.net/api/coloris/getbyid/${variante.colorisId}`, {
                 method: "GET",
                 mode: "cors"
             });
@@ -272,7 +271,7 @@
 
         VarianteStocks.value = []
         for (const variante of variantesProduit.value) {
-            stocks = await fetch(`https://apififa.azurewebsites.net/api/Stock/GetByVarianteId?ids=${variante.varianteProduitId}`, {
+            stocks = await fetch(`https://apififa2.azurewebsites.net/api/Stock/GetByVarianteId?ids=${variante.varianteProduitId}`, {
                 method: "GET",
                 mode: "cors"
             });
@@ -286,7 +285,7 @@
         }
 
         // pour avoir l'image 
-        const thirdResponse = await fetch(`https://apififa.azurewebsites.net/api/produit/getanimageofproduitbyid/${route.params.id}`, {
+        const thirdResponse = await fetch(`https://apififa2.azurewebsites.net/api/produit/getanimageofproduitbyid/${route.params.id}`, {
             method: "GET",
             mode: "cors"
         })

@@ -9,9 +9,10 @@ const usePanierStore = defineStore("panier", {
         variantes: [],
         stocks: [],
         quantites: [],
+        images:[],
     }),
     actions: {
-        add(produit, variante, stk) {
+        add(produit, variante, stk, image) {
             if(this.stocks.includes(stk))
                 return this.augmenteQuantite(stk)
             this.nombreProduits++
@@ -19,6 +20,7 @@ const usePanierStore = defineStore("panier", {
             this.variantes.push(variante)
             this.stocks.push(stk)
             this.quantites.push(1)
+            this.images.push(image)
         },
         augmenteQuantite(stk){
             let index = this.stocks.indexOf(stk)
@@ -38,6 +40,7 @@ const usePanierStore = defineStore("panier", {
             this.produits.splice(index, 1)
             this.variantes.splice(index, 1)
             this.quantites.splice(index, 1)
+            this.images.splice(index, 1)
             this.stocks.splice(index, 1)
         },
         augmentationPossible(stk){
@@ -53,6 +56,7 @@ const usePanierStore = defineStore("panier", {
         getVariantes: (state) => state.variantes,
         getQuantites: (state) => state.quantites,
         getStocks: (state) => state.stocks,
+        getImages: (state) => state.images,
     }
 })
 

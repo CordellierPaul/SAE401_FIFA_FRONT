@@ -13,7 +13,7 @@ async function fetchCompteData() {
 
     console.log(compteStore.token);
 
-    const response = await fetch("https://apififa.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
+    const response = await fetch("https://apififa2.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${compteStore.token}`,
@@ -30,7 +30,7 @@ onMounted(fetchCompteData)
 
 async function supprimerCompte() {
 
-    await fetch("https://apififa.azurewebsites.net/api/compte/" + compteStore.compteId, {
+    await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "DELETE",
         headers: {
             "Authorization": `Bearer ${compteStore.token}`

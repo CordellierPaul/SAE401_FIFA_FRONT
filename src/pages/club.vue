@@ -27,7 +27,7 @@
 
 
     async function fetchAll(){
-        await getRequest(club, 'https://apififa.azurewebsites.net/api/club/getbyid/'+clubId)
+        await getRequest(club, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+clubId)
 
     }
 

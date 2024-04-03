@@ -77,7 +77,7 @@ async function boutonConnexionCompte() {
     //     return
     // }
     
-    const response = await fetch("https://apififa.azurewebsites.net/api/accescompte/connexion", {
+    const response = await fetch("https://apififa2.azurewebsites.net/api/accescompte/connexion", {
         method: "POST",
         mode: "cors",
         headers: {
