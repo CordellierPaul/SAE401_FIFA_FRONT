@@ -5,7 +5,7 @@ import { useStorage } from '@vueuse/core';
 const usePanierStore = defineStore("panier", {
     state: () => ({
         nombreProduits: useStorage("nombreProduits", 0),
-        prixSousTotal : 0,
+        prixSousTotal : useStorage("prixSousTotal", 0),
         produits: useStorage("produits", []),
         variantes: useStorage("variantes", []),
         stocks: useStorage("stocks", []),
