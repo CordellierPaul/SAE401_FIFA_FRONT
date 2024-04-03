@@ -15,6 +15,7 @@
 
     const coloris = ref()
     const colorisNom = ref([])
+    const colorisId = ref([])
 
     const categories = ref()
     const categoriesNom = ref([])
@@ -63,6 +64,7 @@
 
         coloris.value.forEach(coloris => {
             colorisNom.value.push(coloris.colorisNom);
+            colorisId.value.push(coloris.colorisId);
         });
 
         // pour avoir les categories
@@ -125,7 +127,7 @@
             filtreRequestList.value.push([genresNom.value.indexOf(element)+1,"genreId"])
         });
         optionsColorisChecked.value.forEach(element => {
-            filtreRequestList.value.push([colorisNom.value.indexOf(element)+1,"colId"])
+            filtreRequestList.value.push([colorisId.value[colorisNom.value.indexOf(element)],"colId"])
         });
         optionsCategoriesChecked.value.forEach(element => {
             filtreRequestList.value.push([categoriesId.value[categoriesNom.value.indexOf(element)],"catId"])
