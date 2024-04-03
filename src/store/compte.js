@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useStorage } from '@vueuse/core'
 
-// Avec useStorage, les éléments du store ne sont pas réinitialisés avec un rafraichissemet de la pahe
+// Avec useStorage, les éléments du store ne sont pas réinitialisés avec un rafraichissemet de la page
 
 const useCompteStore = defineStore("compte", {
     state: () => ({

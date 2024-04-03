@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue"
-import { formatEmailEstBon, emailEstDansLaBaseDeDonnees } from "./register.vue"
+import { formatEmailEstBon } from "./register.vue"
 import { encrypter } from "../composable/hashageMdp"
 import { useRouter } from "vue-router"
 import useCompteStore from "../store/compte.js"
@@ -13,15 +13,13 @@ const router = useRouter()
 const styleConditionFormatEmail = ref("")
 const styleConditionMdpRempli = ref("")
 const styleMessageChargement = ref("")
-const styleConditionMauvaisMdp = ref("")
-const styleConditionMauvaisEMail = ref("")
+const styleConditionMauvaisMdpOuEmail = ref("")
 
 function reinitialiserStyles() {
     styleConditionFormatEmail.value = "hidden"
     styleConditionMdpRempli.value = "hidden"
     styleMessageChargement.value = "hidden"
-    styleConditionMauvaisMdp.value = "hidden"
-    styleConditionMauvaisEMail.value = "hidden"
+    styleConditionMauvaisMdpOuEmail.value = "hidden"
 }
 
 reinitialiserStyles()
@@ -66,18 +64,8 @@ async function boutonConnexionCompte() {
     compte.value.CompteMdp = ""
 
     styleMessageChargement.value = styteInformation
-
-    // let emailEstDansLaBaseDeDonnee = await emailEstDansLaBaseDeDonnees()
-
-    // console.log(emailEstDansLaBaseDeDonnee);
-
-    // if (!emailEstDansLaBaseDeDonnee) {
-    //     reinitialiserStyles()
-    //     styleConditionMauvaisEMail.value = styleConditionPasRespectee
-    //     return
-    // }
     
-    const response = await fetch("https://apififa.azurewebsites.net/api/accescompte/connexion", {
+    const response = await fetch("https://apififa2.azurewebsites.net/api/accescompte/connexion", {
         method: "POST",
         mode: "cors",
         headers: {
@@ -88,7 +76,7 @@ async function boutonConnexionCompte() {
 
     if (response.status == 401) {
         reinitialiserStyles()
-        styleConditionMauvaisMdp.value = styleConditionPasRespectee
+        styleConditionMauvaisMdpOuEmail.value = styleConditionPasRespectee
     } else if (response.status == 200) {
         
         // On enregistre les données retournées, l'id du compte et le token pour lire les
@@ -133,8 +121,7 @@ async function boutonConnexionCompte() {
             <li :class="styleConditionFormatEmail">Le format de l'e-mail n'est pas correct</li>
             <li :class="styleConditionMdpRempli">Le mot de passe doit être spécifié</li>
             <li :class="styleMessageChargement">Chargement...</li>
-            <li :class="styleConditionMauvaisMdp">Il y a un compte à cette e-mail mais le mot de passe est incorrect</li>
-            <li :class="styleConditionMauvaisEMail">Il n'y a pas de compte à cette e-mail</li>
+            <li :class="styleConditionMauvaisMdpOuEmail">L'e-mail et le mot de passe ne correspondent pas</li>
         </ul>
 
         <button class="btn btn-accent m-5" @click="boutonConnexionCompte">SE CONNECTER</button>

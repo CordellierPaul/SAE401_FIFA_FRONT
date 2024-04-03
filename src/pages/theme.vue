@@ -11,7 +11,7 @@ const router = useRouter();
 
 async function fetchThemes() {
   try {
-    const response = await fetch('https://apififa.azurewebsites.net/api/Theme', {
+    const response = await fetch('https://apififa2.azurewebsites.net/api/Theme', {
       method: 'GET',
       mode: 'cors'
     });

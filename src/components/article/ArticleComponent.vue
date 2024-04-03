@@ -29,7 +29,7 @@
 
         const blogs = ref([]);
         const blogsFiltre = ref([]);
-        getRequest(blogs, "https://apififa.azurewebsites.net/api/blog");
+        getRequest(blogs, "https://apififa2.azurewebsites.net/api/blog");
         watch(blogs, (newBlogs) => {
             blogsFiltre.value = newBlogs.filter(blog => blog.articleId === props.article.articleId);
         });

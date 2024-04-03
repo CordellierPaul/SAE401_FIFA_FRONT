@@ -36,7 +36,7 @@
     
 
     async function fetchAll(){
-        await getRequest(clubs, "https://apififa.azurewebsites.net/api/club");
+        await getRequest(clubs, "https://apififa2.azurewebsites.net/api/club");
     }
 
     onMounted(fetchAll);

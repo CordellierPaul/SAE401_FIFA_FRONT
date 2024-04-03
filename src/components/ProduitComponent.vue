@@ -21,7 +21,7 @@ async function fetchProductImagePath() {
 
   let response;
 
-  response = await fetch("https://apififa.azurewebsites.net/api/produit/getanimageofproduitbyid/" + props.id, {
+  response = await fetch("https://apififa2.azurewebsites.net/api/produit/getanimageofproduitbyid/" + props.id, {
       method: "GET",
       mode: "cors"
   })
@@ -33,7 +33,7 @@ async function fetchProductImagePath() {
 
   image.value = await response.text()
 
-  const secondResponse = await fetch(`https://apififa.azurewebsites.net/api/produit/getbyid/${props.id}`, {
+  const secondResponse = await fetch(`https://apififa2.azurewebsites.net/api/produit/getbyid/${props.id}`, {
             method: "GET",
             mode: "cors"
         })
