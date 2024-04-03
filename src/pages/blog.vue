@@ -72,9 +72,9 @@
     const article = ref([]);
 
     async function fetchAll(){
-        await getRequest(blog, 'https://apififa.azurewebsites.net/api/blog/getbyid/'+blogId)
-        await getRequest(blogs, "https://apififa.azurewebsites.net/api/blog");
-        await getRequest(article, 'https://apififa.azurewebsites.net/api/article/getbyid/'+blog.value.articleId)
+        await getRequest(blog, 'https://apififa2.azurewebsites.net/api/blog/getbyid/'+blogId)
+        await getRequest(blogs, "https://apififa2.azurewebsites.net/api/blog");
+        await getRequest(article, 'https://apififa2.azurewebsites.net/api/article/getbyid/'+blog.value.articleId)
         console.log(blog.value.articleId)
 
         blogsFiltre.value = blogs.value.filter(leBlog => leBlog.articleId === blog.value.articleId);

@@ -29,7 +29,7 @@
 
     async function fetchObjects() {
         // pour avoir les tailles
-        const tailleResponse = await fetch("https://apififa.azurewebsites.net/api/taille", {
+        const tailleResponse = await fetch("https://apififa2.azurewebsites.net/api/taille", {
             method: "GET",
             mode: "cors"
         })
@@ -41,7 +41,7 @@
         });
 
         // pour avoir les genre
-        const genreResponse = await fetch("https://apififa.azurewebsites.net/api/genre", {
+        const genreResponse = await fetch("https://apififa2.azurewebsites.net/api/genre", {
             method: "GET",
             mode: "cors"
         })
@@ -53,7 +53,7 @@
         });
 
         // pour avoir les coloris
-        const colorisResponse = await fetch("https://apififa.azurewebsites.net/api/coloris", {
+        const colorisResponse = await fetch("https://apififa2.azurewebsites.net/api/coloris", {
             method: "GET",
             mode: "cors"
         })
@@ -65,7 +65,7 @@
         });
 
         // pour avoir les categories
-        const categorisResponse = await fetch("https://apififa.azurewebsites.net/api/categorie", {
+        const categorisResponse = await fetch("https://apififa2.azurewebsites.net/api/categorie", {
             method: "GET",
             mode: "cors"
         })
@@ -77,7 +77,7 @@
         });
 
         // pour avoir les pays
-        const paysResponse = await fetch("https://apififa.azurewebsites.net/api/pays/GetWhereProduitExists ", {
+        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays/GetWhereProduitExists ", {
             method: "GET",
             mode: "cors"
         })
@@ -148,7 +148,7 @@
     });
 
     async function fetchProduitsFiltres(request){
-        const Response = await fetch(`https://apififa.azurewebsites.net/api/produit/getbyfilter?${request}`, {
+        const Response = await fetch(`https://apififa2.azurewebsites.net/api/produit/getbyfilter?${request}`, {
             method: "GET",
             mode: "cors"
         })

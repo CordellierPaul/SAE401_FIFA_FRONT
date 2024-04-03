@@ -31,5 +31,5 @@
     
     const articles = ref([])
 
-    getRequest(articles, "https://apififa.azurewebsites.net/api/article");
+    getRequest(articles, "https://apififa2.azurewebsites.net/api/article");
 </script>

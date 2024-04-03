@@ -178,7 +178,7 @@
     });
 
     async function fetchProduit() {
-        const firstResponse = await fetch(`https://apififa.azurewebsites.net/api/produit/getbyid/${route.params.id}`, {
+        const firstResponse = await fetch(`https://apififa2.azurewebsites.net/api/produit/getbyid/${route.params.id}`, {
             method: "GET",
             mode: "cors"
         })
@@ -217,7 +217,7 @@
         let c
 
         for (const variante of variantesProduit.value) {
-            r = await fetch(`https://apififa.azurewebsites.net/api/coloris/getbyid/${variante.colorisId}`, {
+            r = await fetch(`https://apififa2.azurewebsites.net/api/coloris/getbyid/${variante.colorisId}`, {
                 method: "GET",
                 mode: "cors"
             });
@@ -272,7 +272,7 @@
 
         VarianteStocks.value = []
         for (const variante of variantesProduit.value) {
-            stocks = await fetch(`https://apififa.azurewebsites.net/api/Stock/GetByVarianteId?ids=${variante.varianteProduitId}`, {
+            stocks = await fetch(`https://apififa2.azurewebsites.net/api/Stock/GetByVarianteId?ids=${variante.varianteProduitId}`, {
                 method: "GET",
                 mode: "cors"
             });
@@ -286,7 +286,7 @@
         }
 
         // pour avoir l'image 
-        const thirdResponse = await fetch(`https://apififa.azurewebsites.net/api/produit/getanimageofproduitbyid/${route.params.id}`, {
+        const thirdResponse = await fetch(`https://apififa2.azurewebsites.net/api/produit/getanimageofproduitbyid/${route.params.id}`, {
             method: "GET",
             mode: "cors"
         })

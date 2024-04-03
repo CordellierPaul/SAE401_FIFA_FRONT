@@ -48,7 +48,7 @@ const styleCondition12Caracteres = ref(classesPourListeCondition["infomation"])
 
 // On accède aux pays
 const listePays = ref([])
-getRequest(listePays, "https://apififa.azurewebsites.net/api/pays")
+getRequest(listePays, "https://apififa2.azurewebsites.net/api/pays")
 
 var idTimeoutVerificationMdp = null
 
@@ -201,7 +201,7 @@ async function boutonCreationCompte() {
 
     compte.value.compteMdp = ""
 
-    const response = await fetch("https://apififa.azurewebsites.net/api/accescompte/inscription", {
+    const response = await fetch("https://apififa2.azurewebsites.net/api/accescompte/inscription", {
         method: "POST",
         mode: "cors",
         headers: {
@@ -269,7 +269,7 @@ export function formatEmailEstBon(email) {
 
 export async function emailEstDansLaBaseDeDonnees(email) {
 
-    const response = await fetch("https://apififa.azurewebsites.net/api/compte/EmailIsInDatabase/" + email, {
+    const response = await fetch("https://apififa2.azurewebsites.net/api/compte/EmailIsInDatabase/" + email, {
         method: "GET",
         mode: "cors"
     })
