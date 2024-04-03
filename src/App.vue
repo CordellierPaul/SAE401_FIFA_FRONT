@@ -6,19 +6,17 @@ import CookieComponent from './components/CookiesComponent.vue'
 </script>
 
 <template>
-  <div>
-    
+  <div class="min-h-screen">
     <HeaderComponent></HeaderComponent>
-
-    <CookieComponent></CookieComponent>
     
     <div id="content">
       <RouterView />
     </div>
     
-    <FooterComponent></FooterComponent>
-  </div>
+    <FooterComponent class="sticky top-[100vh]"></FooterComponent>
 
+    <CookieComponent></CookieComponent>
+  </div>
 </template>
 
 <style scoped>

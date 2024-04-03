@@ -1,7 +1,7 @@
 <script setup>
     import { getRequest } from '@/composable/httpRequests';
     import { ref, onMounted } from 'vue';
-    import { useRoute,useRouter } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import useCompteStore from "../store/compte.js";
 
 

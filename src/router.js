@@ -108,6 +108,16 @@ const routes = [
       path: '/parametres-compte',
       name: 'parametres-compte',
       component: () => import('@/pages/parametresCompte.vue')
+    },
+    {
+      path: '/parametres-compte/donnees-bancaires',
+      name: 'donnees-bancaires',
+      component: () => import('@/pages/donneesBancaires.vue')
+    },
+    {
+      path: '/erreur-pas-connecte',
+      name: 'erreur-pas-connecte',
+      component: () => import('@/pages/erreurPasConnecte.vue')
     }
   ];
 
