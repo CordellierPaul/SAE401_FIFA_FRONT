@@ -29,7 +29,7 @@
 
     async function fetchObjects() {
         // pour avoir les tailles
-        const tailleResponse = await fetch("https://apififa.azurewebsites.net/api/taille", {
+        const tailleResponse = await fetch("https://apififa2.azurewebsites.net/api/taille", {
             method: "GET",
             mode: "cors"
         })
@@ -41,7 +41,7 @@
         });
 
         // pour avoir les genre
-        const genreResponse = await fetch("https://apififa.azurewebsites.net/api/genre", {
+        const genreResponse = await fetch("https://apififa2.azurewebsites.net/api/genre", {
             method: "GET",
             mode: "cors"
         })
@@ -53,7 +53,7 @@
         });
 
         // pour avoir les coloris
-        const colorisResponse = await fetch("https://apififa.azurewebsites.net/api/coloris", {
+        const colorisResponse = await fetch("https://apififa2.azurewebsites.net/api/coloris", {
             method: "GET",
             mode: "cors"
         })
@@ -65,7 +65,7 @@
         });
 
         // pour avoir les categories
-        const categorisResponse = await fetch("https://apififa.azurewebsites.net/api/categorie", {
+        const categorisResponse = await fetch("https://apififa2.azurewebsites.net/api/categorie", {
             method: "GET",
             mode: "cors"
         })
@@ -77,7 +77,7 @@
         });
 
         // pour avoir les pays
-        const paysResponse = await fetch("https://apififa.azurewebsites.net/api/pays/GetWhereProduitExists ", {
+        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays/GetWhereProduitExists ", {
             method: "GET",
             mode: "cors"
         })
@@ -89,8 +89,6 @@
              paysId.value.push(pays.paysId);
          });
 
-        
-        console.log(pays.value)
 
     }
 
@@ -141,6 +139,7 @@
         });
 
         fetchProduitsFiltres(filtreRequestStr.value);
+
         console.log(filtreRequestStr.value);
 
     },{
@@ -148,12 +147,14 @@
     });
 
     async function fetchProduitsFiltres(request){
-        const Response = await fetch(`https://apififa.azurewebsites.net/api/produit/getbyfilter?${request}`, {
+        const Response = await fetch(`https://apififa2.azurewebsites.net/api/produit/getbyfilter?${request}`, {
             method: "GET",
             mode: "cors"
         })
         
         produitsFiltre.value = await Response.json()
+
+        console.log(produitsFiltre.value);
     }
 
     function compare(a, b) {
@@ -222,17 +223,16 @@
                 </div>
 
                 <div id="container" class="flex flex-wrap items-center justify-center gap-10 p-2">
-                    <!-- <p v-if="produits" v-for="produit in produits" :id="produit.produitId" :nom="produit.produitNom"> {{ produit.variantesProduit[0] }} </p> -->
-                    <ProduitComponent v-if="produitsFiltre" v-for="produit in produitsFiltre" :id="produit.produitId" :nom="produit.produitNom" />
-                    <div v-else v-for="i in 5" >
-                        <div class="flex flex-col gap-4 w-52">
-                            <div class="skeleton h-32 w-full"></div>
-                            <div class="skeleton h-4 w-28"></div>
-                            <div class="skeleton h-4 w-full"></div>
-                            <div class="skeleton h-4 w-full"></div>
-                        </div>
-                    </div>
+                    <template v-if="produitsFiltre.length > 0">
+                        <ProduitComponent v-for="produit in produitsFiltre" :key="produit.produitId" :id="produit.produitId" :nom="produit.produitNom" />
+                    </template>
+                    <template v-else>
+                        <div class="text-gray-500">Aucun produit trouvé.</div>
+                    </template>
                 </div>
+
+
+
                 <div class="m-10 flex items-center justify-center">
                     <button class="btn btn-primary text-white">Voir plus</button>
                 </div>

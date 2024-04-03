@@ -16,7 +16,7 @@
 
     async function fetchTheme() {
         try {
-        const responseTheme = await fetch(`https://apififa.azurewebsites.net/api/Theme/getbyid/${route.query.id}`, {
+        const responseTheme = await fetch(`https://apififa2.azurewebsites.net/api/Theme/getbyid/${route.query.id}`, {
             method: 'GET',
             mode: 'cors'
         });
@@ -32,7 +32,7 @@
 
     async function fetchUtilisateur() {
         try {
-        const responseUtilisateur = await fetch(`https://apififa.azurewebsites.net/api/Compte/getbyid/${compteStore.compteId}`, {
+        const responseUtilisateur = await fetch(`https://apififa2.azurewebsites.net/api/Compte/getbyid/${compteStore.compteId}`, {
             method: 'GET',
             mode: 'cors'
         });
@@ -56,7 +56,7 @@
 
     async function fetchJoueurs() {
         try {
-        const responseTheme = await fetch(`https://apififa.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
+        const responseTheme = await fetch(`https://apififa2.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
             method: 'GET',
             mode: 'cors'
         });
@@ -143,7 +143,7 @@
       for (let vote of votes) {
         console.log(vote);
         try {
-          const response = await fetch('https://apififa.azurewebsites.net/api/Vote', {
+          const response = await fetch('https://apififa2.azurewebsites.net/api/Vote', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
