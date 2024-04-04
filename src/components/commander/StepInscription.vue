@@ -11,6 +11,7 @@
 
         
         <p class="text-xl font-medium">COORDONNÉES</p>
+        {{ compteStore.utilisateur }}
         <label class="form-control w-full max-w-s">
             <div class="label ">
                 <span class="label-text-alt"></span>
@@ -56,6 +57,12 @@
 
 
 <script setup>
+    import { onMounted, ref } from "vue";
+    import useCompteStore from "../../store/compte.js";
+
+
+    const compteStore = useCompteStore();
+
      const emit = defineEmits(['next'])
 
     function btClick() {

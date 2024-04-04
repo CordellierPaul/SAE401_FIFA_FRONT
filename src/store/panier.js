@@ -24,13 +24,13 @@ const usePanierStore = defineStore("panier", {
             this.quantites.push(1)
             this.images.push(image)
             this.coloris.push(col)
-            this.prixSousTotal = (parseFloat(this.prixSousTotal)+ parseFloat(variante.varianteProduitPrix * (1- variante.varianteProduitPromo))).toFixed(2)
+            this.prixSousTotal = parseFloat(this.prixSousTotal)+ parseFloat((variante.varianteProduitPrix * (1- variante.varianteProduitPromo)).toFixed(2))
         },
         augmenteQuantite(stk){
             let index = this.stocks.indexOf(stk)
             this.nombreProduits++
             this.quantites[index]++
-            this.prixSousTotal =(parseFloat(this.prixSousTotal)+ parseFloat(this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo))).toFixed(2)
+            this.prixSousTotal =parseFloat(this.prixSousTotal)+ parseFloat((this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo)).toFixed(2))
         },
         baisseQuantite(stk) {
             let index = this.stocks.indexOf(stk)
@@ -38,12 +38,12 @@ const usePanierStore = defineStore("panier", {
                 return this.supprimeProduit(stk)
             this.nombreProduits--
             this.quantites[index]--
-            this.prixSousTotal = (parseFloat(this.prixSousTotal)- parseFloat(this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo))).toFixed(2)
+            this.prixSousTotal = parseFloat(this.prixSousTotal)- parseFloat((this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo)).toFixed(2))
         },
         supprimeProduit(stk) {            
             let index = this.stocks.indexOf(stk)
             this.nombreProduits-= this.quantites[index]
-            this.prixSousTotal = (parseFloat(this.prixSousTotal)- parseFloat(this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo)*this.quantites[index])).toFixed(2)        
+            this.prixSousTotal = parseFloat(this.prixSousTotal)- parseFloat((this.variantes[index].varianteProduitPrix * (1- this.variantes[index].varianteProduitPromo)).toFixed(2)*this.quantites[index])       
             this.produits.splice(index, 1)
             this.variantes.splice(index, 1)
             this.quantites.splice(index, 1)
@@ -53,10 +53,12 @@ const usePanierStore = defineStore("panier", {
         },
         augmentationPossible(stk){
             let index = this.stocks.indexOf(stk)
-            console.log(index)
             if(index != -1 && this.quantites[index] == stk.quantiteStockee)
                 return false
             return true;
+        },
+        remise(){
+            this.prixSousTotal = 0
         }
     },
     getters: {
@@ -67,7 +69,7 @@ const usePanierStore = defineStore("panier", {
         getStocks: (state) => state.stocks,
         getImages: (state) => state.images,
         getColoris: (state) => state.coloris,
-        sousTotal: (state) => state.prixSousTotal,
+        sousTotal: (state) => parseFloat(state.prixSousTotal).toFixed(2),
     }
 })
 
