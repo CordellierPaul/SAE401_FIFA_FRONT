@@ -73,7 +73,7 @@ async function boutonConnexionCompte() {
         },
         body: JSON.stringify(compteAvecMDPHashe)
     })
-
+    console.log(JSON.stringify(compteAvecMDPHashe))
     if (response.status == 401) {
         reinitialiserStyles()
         styleConditionMauvaisMdpOuEmail.value = styleConditionPasRespectee

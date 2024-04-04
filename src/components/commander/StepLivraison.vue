@@ -19,7 +19,7 @@
                     <input type="radio" name="radio-1" id="radio_std" class="radio" value="0" v-model="livraisonChoisis" checked/>
                     <label for="radio_std">{{livraisons[0].livraisonType}} (Jusqu'à 4 jours ouvrables)</label>
                 </div>
-                <p>{{livraisons[0].livraisonPrix}}€</p>
+                <p>{{prixPresision2(livraisons[0].livraisonPrix)}}€</p>
             </div>
             <div class="divider"></div> 
             <div >
@@ -27,7 +27,7 @@
                     <input type="radio" name="radio-1" id="radio_xpr" class="radio" value="1" v-model="livraisonChoisis"/>
                     <label for="radio_xpr">{{livraisons[1].livraisonType}} (Jusqu'à 3 jours ouvrables)</label>
                 </div>
-                <p>{{livraisons[1].livraisonPrix}}€</p>
+                <p>{{prixPresision2(livraisons[1].livraisonPrix)}}€</p>
             </div>
         </div>
 
@@ -44,23 +44,16 @@
 
 
 <script setup>
-import { onMounted, ref } from 'vue';
-
-    const livraisons = ref([])
+import { onMounted, ref, defineProps } from 'vue';
+    const props = defineProps({
+        livraisons: Object
+    });
     
     const livraisonChoisis = defineModel()
 
-
-    async function fetchLivraisons() {
-        const livResponse = await fetch("https://apififa2.azurewebsites.net/api/livraison ", {
-            method: "GET",
-            mode: "cors"
-        })
-
-        livraisons.value = await livResponse.json()
+    function prixPresision2(prix){
+        return parseFloat(prix).toFixed(2)
     }
-
-    onMounted(fetchLivraisons)
 
     const emit = defineEmits(['next','previous'])
 
