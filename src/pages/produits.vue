@@ -25,6 +25,8 @@
     const paysNom = ref([])
     const paysId = ref([])
 
+    const ordprix = ref(null);
+
 
     // pour récupérer tous les produits
 
@@ -96,7 +98,18 @@
 
     }
 
-    onMounted(fetchObjects)
+    onMounted(() => {
+        fetchObjects(); 
+
+        console.log(ordprix.value); 
+
+        if (ordprix.value) {
+        // Ajoutez un écouteur d'événement change une fois que l'élément select est rendu dans le DOM
+        ordprix.value.addEventListener('change', (event) => {
+            trierProduits(event);
+        });
+        }
+    });
 
     // pour gérer les fitres
     const optionsTaillesChecked = ref([])
@@ -144,10 +157,20 @@
 
         fetchProduitsFiltres(filtreRequestStr.value);
 
-        console.log(filtreRequestStr.value);
 
     },{
         deep: true
+    });
+
+    watchEffect(() => {
+        const triParPrix = document.querySelector('#ordprix');
+        console.log(triParPrix)
+        if (triParPrix) {
+            console.log("hehe")
+            triParPrix.addEventListener('change', (event) => {
+                trierProduits(event);
+            });
+        }
     });
 
     async function fetchProduitsFiltres(request){
@@ -158,7 +181,6 @@
         
         produitsFiltre.value = await Response.json()
 
-        console.log(produitsFiltre.value);
     }
 
     function compare(a, b) {
@@ -171,7 +193,20 @@
         return 0;
     }
     
-    
+    function trierProduits(event) {
+        console.log("Trier les produits en fonction de l'option sélectionnée :", event.target.value);
+
+        const ordre = event.target.value;
+        
+        // Vérifiez l'option sélectionnée et triez les produits en conséquence
+        if (ordre === 'croissant') {
+            // Triez les produits par ordre croissant du prix
+            produitsFiltre.value.sort((a, b) => a.prix - b.prix);
+        } else if (ordre === 'decroissant') {
+            // Triez les produits par ordre décroissant du prix
+            produitsFiltre.value.sort((a, b) => b.prix - a.prix);
+        }
+    }
 
 </script>
 
@@ -187,11 +222,12 @@
             <select class="select select-primary w-full max-w-xs lg:hidden">
                 <option selected>Filtrer par</option>
             </select>
-            <select class="select select-primary w-full max-w-xs bg-secondary text-white border-white">
+            <select ref="ordprix" class="select select-primary w-full max-w-xs bg-secondary text-white border-white" @change="trierProduits">
                 <option selected>Classer par défaut</option>
-                <option>Prix: Par ordre croissant</option>
-                <option>Prix: Par ordre décroissant</option>
+                <option value="croissant">Prix: Par ordre croissant</option>
+                <option value="decroissant">Prix: Par ordre décroissant</option>
             </select>
+
         </div>
         
         <div class="flex">
