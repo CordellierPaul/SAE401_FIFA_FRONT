@@ -1,13 +1,20 @@
 <template>
-    <div v-if="match" :class="{
-    'bg-green-200': (match.clubDomicile === clubId && match.matchScoreDomicile > match.matchScoreExterieur),
-    'bg-red-200': (match.clubDomicile === clubId && match.matchScoreDomicile < match.matchScoreExterieur),
-    'bg-base-200': (match.matchScoreDomicile === match.matchScoreExterieur),
-    'bg-green-200': (match.clubExterieur === clubId && match.matchScoreExterieur > match.matchScoreDomicile),
-    'bg-red-200': (match.clubExterieur === clubId && match.matchScoreExterieur < match.matchScoreDomicile)
+    <div v-if="match && idClub" :class="{
+        // Si club est domicile et que domicile gagne ou si club est exterieur et exterieur gagne
+    'bg-green-200': (
+        (match.clubDomicileId == idClub && match.matchScoreDomicile > match.matchScoreExterieur) ||
+        (match.clubExterieurId == idClub && match.matchScoreExterieur > match.matchScoreDomicile)),
+
+        // Si club est domicile et que domicile perde ou si club est exterieur et exterieur perde
+    'bg-red-200': (
+        (match.clubDomicileId == idClub && match.matchScoreDomicile < match.matchScoreExterieur) ||
+        (match.clubExterieurId == idClub && match.matchScoreExterieur < match.matchScoreDomicile)),
+
+        //égalité
+    'bg-base-200': (match.matchScoreDomicile == match.matchScoreExterieur),
+
 }" class="m-5 w-2/3 p-5 flex items-center justify-center">
         <div class="w-full">
-
             <p>{{ match.matchDate }}</p>
             <div class="m-5 flex items-center justify-center text-2xl *:mx-2">
                 <div class="w-96 flex items-center justify-center flex-col">
@@ -29,7 +36,8 @@
     import { defineProps, onMounted, ref } from 'vue';
     import { getRequest } from '@/composable/httpRequests';
     const props = defineProps({
-        match: Object
+        match: Object,
+        idClub: Number
     })
 
     const clubDomi = ref([]);

@@ -11,7 +11,7 @@
                 <div class="divider"></div>
                 <p class="text-2xl">Domiciles:</p>
                 <div class="flex items-center justify-center flex-col">
-                    <MatchClubComponent v-for="(match, index) in displayedMatchesDomi" :key="index" :match="match"></MatchClubComponent>
+                    <MatchClubComponent v-for="(match, index) in displayedMatchesDomi" :key="index" :match="match" :idClub="clubId"></MatchClubComponent>
                 </div>
                 <div class="flex justify-center items-center m-10">
                     <button @click="loadMoreMatchesDomi" v-if="displayedMatchesDomi.length < club.matchesDomicile.length" class="btn btn-primary">Voir plus</button>
@@ -19,7 +19,7 @@
                 <div class="divider"></div>
                 <p class="text-2xl">Exterieur:</p>
                 <div class="flex items-center justify-center flex-col">
-                    <MatchClubComponent v-for="(match,index) in displayedMatchesExt" :key="index" :match="match"></MatchClubComponent>
+                    <MatchClubComponent v-for="(match,index) in displayedMatchesExt" :key="index" :match="match" :idClub="clubId"></MatchClubComponent>
                 </div>
                 <div class="flex justify-center items-center m-10">
                     <button @click="loadMoreMatchesExt" v-if="displayedMatchesExt.length < club.matchesExterieur.length" class="btn btn-primary">Voir plus</button>
