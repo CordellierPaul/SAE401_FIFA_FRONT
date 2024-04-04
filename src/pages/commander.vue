@@ -12,14 +12,18 @@
     const livraisonChoisis = ref(0)
     const step = ref('inscription')
 
+    function prixPresision2(prix){
+        return parseFloat(prix).toFixed(2)
+    }
+
     
     async function fetchLivraisons() {
-        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/livraison ", {
+        const livResponse = await fetch("https://apififa2.azurewebsites.net/api/livraison ", {
             method: "GET",
             mode: "cors"
         })
 
-        livraisons.value = await paysResponse.json()
+        livraisons.value = await livResponse.json()
     }
 
     onMounted(fetchLivraisons)
@@ -45,7 +49,7 @@
         <div class="flex items-center  flex-col w-7/12 bg-base-200 p-2 mr-1" >
             
             <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" ></StepInscription>
-            <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis"></StepLivraison>
+            <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis" :livraisons="livraisons"></StepLivraison>
             <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'"></StepPaiement>
         </div>
 
@@ -74,7 +78,7 @@
                             <p>Sous-total</p>
                             <p class="mx-1 font-normal text-sm">({{ panierStore.count }})</p>
                         </div>
-                        <p>{{ panierStore.sousTotal }} €</p>
+                        <p>{{ prixPresision2(panierStore.sousTotal) }} €</p>
                     </div>
                     <div class="divider"></div> 
                     <div>
@@ -82,7 +86,7 @@
                             <p>Livraison</p>
                             <div v-if="livraisons.length >1" class="flex gap-1">
                                 <p>{{livraisons[livraisonChoisis].livraisonType}}</p>
-                                <p>({{livraisons[livraisonChoisis].livraisonPrix}}€)</p>
+                                <p>({{prixPresision2(livraisons[livraisonChoisis].livraisonPrix)}}€)</p>
                             </div>
                         </div>
                     </div>
