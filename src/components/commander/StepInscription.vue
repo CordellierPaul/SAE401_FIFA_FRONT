@@ -11,6 +11,8 @@
 
         
         <p class="text-xl font-medium">COORDONNÉES</p>
+        <!-- A REPPRENDRE -->
+        <!-- {{ compteStore }}
         <label class="form-control w-full max-w-s">
             <div class="label ">
                 <span class="label-text-alt"></span>
@@ -19,13 +21,16 @@
                     <RouterLink :to="{name: 'login'}" class="font-bold hover:underline">Connexion</RouterLink>
                 </span>
             </div>
-            <input type="text" placeholder="Courriel *" class="input input-bordered w-full " />
-            <div class="label ">
-                <span class="label-text-alt text-red-500">Courriel is required.</span>
-                <span class="label-text-alt ">
-                </span>
+            <input v-if="compteStore.utilisateur.utilisateurNomAcheteur" type="text" placeholder="Nom *" class="input input-bordered w-full " />
+            <div v-if="compteStore.utilisateur.utilisateurTelAcheteur">
+                <input type="text" placeholder="Téléphone *" class="input input-bordered w-full " />
+                <div class="label ">
+                    <span class="label-text-alt text-red-500">Le téléphone est obligatoire.</span>
+                    <span class="label-text-alt ">
+                    </span>
+                </div>
             </div>
-        </label>
+        </label> -->
         
         <p class="text-xl font-medium">ADRESSE DE LIVRAISON</p>
         
@@ -56,6 +61,12 @@
 
 
 <script setup>
+    import { onMounted, ref } from "vue";
+    import useCompteStore from "../../store/compte.js";
+
+
+    const compteStore = useCompteStore();
+
      const emit = defineEmits(['next'])
 
     function btClick() {

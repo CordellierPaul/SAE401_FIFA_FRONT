@@ -90,7 +90,7 @@ function panierPlus(index) {
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-300 rounded-box w-52">
             <li>
               <RouterLink class="justify-between" :to="{name: 'login'}">
-                Profil<span class="badge badge-accent">Nouveau</span>
+                Vos commandes<span class="badge badge-accent">A FAIRE</span>
               </RouterLink>
             </li>
             <li>
@@ -156,8 +156,11 @@ function panierPlus(index) {
                     </div>
                   </div>
                 </div>
-                <div class="card-actions">
+                <div v-if="compteStore.isConnected">
                   <RouterLink :to="{name: 'commander'}" class="btn-block btn btn-primary">Payer la commande</RouterLink>
+                </div>
+                <div v-else class="card-actions">
+                  <RouterLink :to="{name: 'login'}" class="btn-block btn btn-primary">Connectez-vous pour passer commande</RouterLink>                  
                 </div>
 
               </div>
