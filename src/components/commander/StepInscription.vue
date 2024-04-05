@@ -28,7 +28,7 @@
                 <p class="input input-bordered w-full ">Telephone : {{ compteStore.utilisateur[0].utilisateurTelAcheteur }}</p>
             </div>
             <div v-else>
-                <input type="text" required  placeholder="Téléphone" class="input input-bordered w-full " />
+                <input type="text" required  placeholder="Téléphone" class="input input-bordered w-full " pattern="[0]{1}[0-9]{9}"/>
                 <div class="label ">
                     <span class="label-text-alt text-red-500">Le téléphone est obligatoire.</span>
                     <span class="label-text-alt ">
@@ -38,9 +38,6 @@
         </label>
         
         <p class="text-xl font-medium">ADRESSE DE LIVRAISON</p>
-        {{ adresse }}
-        {{ ville }}
-        {{ pays }}
         <div class="*:my-2 w-full" v-if="!compteStore.utilisateur[0].adresseId">
             <select class="select select-bordered w-full" placeholder="Pays">
                 <option >France</option>
@@ -50,7 +47,6 @@
             </select>
             
             <input type="text" required placeholder="Adresse" class="input input-bordered w-full " />
-            <input type="text" placeholder="Appartement, suite, etc. (champ faculatatif)" class="input input-bordered w-full " />
 
             <div class="flex gap-2">
                 <input type="text" required placeholder="Code postal" class="input input-bordered w-full " />
@@ -59,7 +55,6 @@
 
         </div>
         <div class="*:my-2 w-full" v-else>
-            
             <p class="input input-bordered w-full ">{{ pays? pays.paysNom :'' }}</p>
             
             <p type="text" class="input input-bordered w-full ">{{ adresse? adresse.adresseRue : '' }}</p>
@@ -78,35 +73,53 @@
 
 
 <script setup>
-    import { onMounted, ref } from "vue";
+    import { defineModel, ref } from "vue";
     import useCompteStore from "../../store/compte.js";
     
-    const adresse = ref();
-    const ville = ref();
-    const pays = ref();
-    async function fetchAddresse() {
-        if(!compteStore.utilisateur[0].adresseId)
-            return;
-        const adrResponse = await fetch("https://apififa2.azurewebsites.net/api/adresse/getbyid/"+compteStore.utilisateur[0].adresseId, {
-            method: "GET",
-            mode: "cors"
-        })
+    // const adresse = ref();
+    // const ville = ref();
+    // const pays = ref();
+    const props = defineProps({
+        adresse: Object,
+        ville: Object,
+        pays: Object,
+    });
+    
+    const newAdresse = defineModel()
+    const villeChoisis = ref()
+    const paysChoisis = ref()
+    // const villes = ref()
+    // const pays = ref()
+    // let inputVille = ref("")
+    // let inputPays = ref("")
 
-        adresse.value = await adrResponse.json()
-        const vilResponse = await fetch("https://apififa2.azurewebsites.net/api/ville/getbyid/"+adresse.value.villeId, {
-            method: "GET",
-            mode: "cors"
-        })
+    // function filteredListVille() {
+    //     return villes.filter((ville) =>
+    //         ville.villeNom.toLowerCase().includes(inputVille.value.toLowerCase())
+    //     );
+    // }
+    // function filteredListPays() {
+    //     return pays.filter((p) =>
+    //         p.paysNom.toLowerCase().includes(inputPays.value.toLowerCase())
+    //     );
+    // }
+    // // async function fetchAddresse() {
+    //     if(compteStore.utilisateur[0].adresseId)
+    //         return;
+    //     const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays", {
+    //         method: "GET",
+    //         mode: "cors"
+    //     })
 
-        ville.value = await vilResponse.json()
-        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays/getbyid/"+ville.value.paysId, {
-            method: "GET",
-            mode: "cors"
-        })
+    //     pays.value = await paysResponse.json()
+    //     const vilResponse = await fetch("https://apififa2.azurewebsites.net/api/ville", {
+    //         method: "GET",
+    //         mode: "cors"
+    //     })
 
-        pays.value = await paysResponse.json()
-    }
-    onMounted(fetchAddresse)
+    //     villes.value = await vilResponse.json()
+    // }
+    // onMounted(fetchAddresse)
     const compteStore = useCompteStore();
 
      const emit = defineEmits(['next'])
