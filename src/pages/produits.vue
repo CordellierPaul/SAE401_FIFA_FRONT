@@ -26,7 +26,7 @@
     const paysId = ref([])
 
     const ordprix = ref(null);
-
+    const varianteProduitPrix = ref()
 
     // pour récupérer tous les produits
 
@@ -197,14 +197,37 @@
         console.log("Trier les produits en fonction de l'option sélectionnée :", event.target.value);
 
         const ordre = event.target.value;
-        
-        // Vérifiez l'option sélectionnée et triez les produits en conséquence
+
         if (ordre === 'croissant') {
-            // Triez les produits par ordre croissant du prix
-            produitsFiltre.value.sort((a, b) => a.prix - b.prix);
+            // par ordre croissant du prix
+            produitsFiltre.value.sort((a, b) => {
+                if (a.variantesProduit && a.variantesProduit.length > 0 && b.variantesProduit && b.variantesProduit.length > 0) {
+                    const prixA = (a.variantesProduit[0].varianteProduitPrix - (a.variantesProduit[0].varianteProduitPrix * a.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    const prixB = (b.variantesProduit[0].varianteProduitPrix - (b.variantesProduit[0].varianteProduitPrix * b.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    return prixA - prixB;
+                }
+            });
+            
+            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
+            console.log(produitsFiltre.value);
+            
         } else if (ordre === 'decroissant') {
-            // Triez les produits par ordre décroissant du prix
-            produitsFiltre.value.sort((a, b) => b.prix - a.prix);
+            // par ordre décroissant du prix
+            produitsFiltre.value.sort((a, b) => {
+                if (a.variantesProduit && a.variantesProduit.length > 0 && b.variantesProduit && b.variantesProduit.length > 0) {
+                    const prixA = (a.variantesProduit[0].varianteProduitPrix - (a.variantesProduit[0].varianteProduitPrix * a.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    const prixB = (b.variantesProduit[0].varianteProduitPrix - (b.variantesProduit[0].varianteProduitPrix * b.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    return prixB - prixA;
+                }
+            });
+            
+            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
+            console.log(produitsFiltre.value);
+        } else if (ordre === 'defaut') {
+            // par ordre croissant du produitId
+            produitsFiltre.value.sort((a, b) => {
+                return a.produitId - b.produitId;
+            });
         }
     }
 
@@ -223,7 +246,7 @@
                 <option selected>Filtrer par</option>
             </select>
             <select ref="ordprix" class="select select-primary w-full max-w-xs bg-secondary text-white border-white" @change="trierProduits">
-                <option selected>Classer par défaut</option>
+                <option selected value="defaut">Classer par défaut</option>
                 <option value="croissant">Prix: Par ordre croissant</option>
                 <option value="decroissant">Prix: Par ordre décroissant</option>
             </select>
