@@ -12,10 +12,11 @@ const basicButtonClass = "bg-gray-500 text-white hover:bg-white hover:text-black
 
 async function fetchCompteData() {
 
-    console.log(compteStore.token);
+    console.log(compteStore.utilisateur);
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
         method: "GET",
+        mode: "no-cors",
         headers: {
             "Authorization": `Bearer ${compteStore.token}`,
             "Content-Type": "application/json",

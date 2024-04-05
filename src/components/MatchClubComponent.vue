@@ -66,7 +66,7 @@
     import { getRequest } from '@/composable/httpRequests';
     const props = defineProps({
         match: Object,
-        idClub: Number
+        idClub: String
     })
 
     const clubDomi = ref([]);
