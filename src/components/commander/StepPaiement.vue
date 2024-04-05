@@ -23,16 +23,48 @@
                     <p>American Express</p>
                 </div>
             </div>
-
-            <input type="text" placeholder="Numéro de carte" class="input input-bordered w-full " />
-            <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " />
-
-            <div class="flex gap-2">     
-                <input type="text" placeholder="Numéro de sécurité (cvv)" class="input input-bordered w-full " />
-                <input type="text" required placeholder="Date d'expiration (MM/AA)" class="input input-bordered w-full " />
+            <div v-if="cb">
+                {{ cb }}
+                <p type="text" class="input input-bordered w-full " >{{ cb? cb.NumeroCarte : '' }}</p>
+                <p type="text" required placeholder="Nom Complet" class="input input-bordered w-full " >{{ cb? cb.NomCarte :'' }}</p>
+    
+                <div class="flex gap-2">     
+                    <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
+                    <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
+                </div>
+            </div>
+            <div v-else>
+                <input type="text" required placeholder="Numéro de carte" pattern="[0-9]{12}" class="input input-bordered w-full " title="12 chiffres"/>
+                <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " />
+    
+                <div class="flex gap-2">     
+                    <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." />
+                    <input type="text" required placeholder="Date d'expiration (MM/AA)" class="input input-bordered w-full " title="Format MM/AA, la date doit être supérieur à celle d'aujourd'hui."/>
+                </div>                
             </div>
         </div>
+        
+        <div v-if(!cb)>
+            <!-- Enregistrer la carte -->
+            <p class="text-xl">Enregistrer la carte pour vos prochaine commande</p>
 
+            <div class="*:my-2 *:flex *:w-full *:justify-between">
+                <div>
+                    <div class="flex gap-2">
+                        <input type="radio" name="enregistreCb" id="eNon" class="radio" value="0" checked/>
+                        <label for="eNon">Ne pas enregistrer.</label>
+                    </div>
+                </div>
+                <div class="divider"></div> 
+                <div >
+                    <div class="flex gap-2">
+                        <input type="radio" name="enregistreCb" id="eOk" class="radio" value="1" v-model="livraisonChoisis"/>
+                        <label for="eOk">Enregistrer.</label>
+                    </div>
+                </div>
+            </div>
+        </div>                
+        <br>
         <p class="text-xl">Facturation</p>
         <p>Sélectionnez l'adresse qui correspond à votre carte ou à votre mode de paiement.</p>
 
@@ -83,8 +115,14 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, defineProps} from 'vue'
 const emit = defineEmits(['next','previous'])
+
+const props = defineProps({
+    cb: Object
+});
+
+const newCb = defineModel()
 
 function btPreviousClick() {
     emit('previous')

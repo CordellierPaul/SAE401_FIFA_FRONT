@@ -29,22 +29,6 @@
     }
 
 
-
-    async function fetchUtilisateur() {
-        try {
-        const responseUtilisateur = await fetch(`https://apififa2.azurewebsites.net/api/Compte/getbyid/${compteStore.compteId}`, {
-            method: 'GET',
-            mode: 'cors'
-        });
-
-        const data = await responseUtilisateur.json();
-        utilisateur.value = data.utilisateurCompte;
-
-        } catch (error) {
-        console.error('Erreur lors de la récupération du utilisateur :', error);
-        }
-    }
-    
     const props = defineProps({
     });
 
@@ -75,7 +59,6 @@
     onMounted(async () => {
       await fetchTheme();
       await fetchJoueurs();
-      await fetchUtilisateur();
     })
 
 
@@ -105,7 +88,7 @@
       selectedPlayers.add(joueur3Id);
 
 
-      const userId = parseInt(utilisateur.value.utilisateurId,10);
+      const userId = parseInt(compteStore.utilisateur[0].utilisateurId,10);
       //const userId = 17;
       const themeId = route.query.id;
       const votes = [];
