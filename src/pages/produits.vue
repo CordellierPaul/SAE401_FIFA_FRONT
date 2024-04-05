@@ -28,6 +28,23 @@
     const ordprix = ref(null);
 
 
+    // FILTRE PETIT FENETRE
+    // const filtres = [
+    //     { titre: 'Taille' },
+    //     { titre: 'Genre' },
+    //     { titre: 'Coloris' },
+    //     { titre: 'Categorie' },
+    //     { titre: 'Pays' }
+    // ];
+
+    // const selectedFilter = ref(null);
+    // const selectedOption = ref(null);
+
+    // function getOptions(filter) {
+    //     const selected = filtres.find(filtre => filtre.titre === filter);
+    //     return selected ? selected.options : [];
+    // }
+
     // pour récupérer tous les produits
 
 
@@ -197,14 +214,37 @@
         console.log("Trier les produits en fonction de l'option sélectionnée :", event.target.value);
 
         const ordre = event.target.value;
-        
-        // Vérifiez l'option sélectionnée et triez les produits en conséquence
+
         if (ordre === 'croissant') {
-            // Triez les produits par ordre croissant du prix
-            produitsFiltre.value.sort((a, b) => a.prix - b.prix);
+            // par ordre croissant du prix
+            produitsFiltre.value.sort((a, b) => {
+                if (a.variantesProduit && a.variantesProduit.length > 0 && b.variantesProduit && b.variantesProduit.length > 0) {
+                    const prixA = (a.variantesProduit[0].varianteProduitPrix - (a.variantesProduit[0].varianteProduitPrix * a.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    const prixB = (b.variantesProduit[0].varianteProduitPrix - (b.variantesProduit[0].varianteProduitPrix * b.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    return prixA - prixB;
+                }
+            });
+            
+            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
+            console.log(produitsFiltre.value);
+            
         } else if (ordre === 'decroissant') {
-            // Triez les produits par ordre décroissant du prix
-            produitsFiltre.value.sort((a, b) => b.prix - a.prix);
+            // par ordre décroissant du prix
+            produitsFiltre.value.sort((a, b) => {
+                if (a.variantesProduit && a.variantesProduit.length > 0 && b.variantesProduit && b.variantesProduit.length > 0) {
+                    const prixA = (a.variantesProduit[0].varianteProduitPrix - (a.variantesProduit[0].varianteProduitPrix * a.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    const prixB = (b.variantesProduit[0].varianteProduitPrix - (b.variantesProduit[0].varianteProduitPrix * b.variantesProduit[0].varianteProduitPromo)).toFixed(2);
+                    return prixB - prixA;
+                }
+            });
+            
+            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
+            console.log(produitsFiltre.value);
+        } else if (ordre === 'defaut') {
+            // par ordre croissant du produitId
+            produitsFiltre.value.sort((a, b) => {
+                return a.produitId - b.produitId;
+            });
         }
     }
 
@@ -219,11 +259,30 @@
                 <li><a @click= "retour"  class="hover:opacity-50 hover:cursor-pointer">Produits</a></li>
             </ul>
         </div>
-            <select class="select select-primary w-full max-w-xs lg:hidden">
+
+            <!-- <select class="select select-primary w-full max-w-xs lg:hidden">
                 <option selected>Filtrer par</option>
+                <select>
+                    <option>
+                        <FiltreComponent v-model:optionsChecked="optionsTaillesChecked" v-if="taillesLibelle" :filtreData="{ titre: 'Taille', options: taillesLibelle }" />
+                    </option>
+                </select>
+                <select><FiltreComponent v-model:optionsChecked="optionsGenresChecked" v-if="genresNom" :filtreData="{ titre: 'Genre', options: genresNom }" /></select>
+                <select><FiltreComponent v-model:optionsChecked="optionsColorisChecked" v-if="colorisNom" :filtreData="{ titre: 'Coloris', options: colorisNom }" /></select>
+                <select><FiltreComponent v-model:optionsChecked="optionsCategoriesChecked" v-if="categoriesNom" :filtreData="{ titre: 'Categorie', options: categoriesNom }" /></select>
+                <select><FiltreComponent v-model:optionsChecked="optionsPaysChecked" v-if="paysNom" :filtreData="{ titre: 'Pays', options: paysNom }" /></select>
+            </select> -->
+
+            <template v-if="selectedFilter">
+            <select v-model="selectedOption" class="select select-primary w-full max-w-xs lg:hidden">
+                <option selected disabled>Choisir {{ selectedFilter }}</option>
+                <!-- Ajout des options pour le filtre sélectionné -->
+                <option v-for="option in getOptions(selectedFilter)" :key="option">{{ option }}</option>
             </select>
+        </template>
+
             <select ref="ordprix" class="select select-primary w-full max-w-xs bg-secondary text-white border-white" @change="trierProduits">
-                <option selected>Classer par défaut</option>
+                <option selected value="defaut">Classer par défaut</option>
                 <option value="croissant">Prix: Par ordre croissant</option>
                 <option value="decroissant">Prix: Par ordre décroissant</option>
             </select>

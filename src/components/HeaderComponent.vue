@@ -89,7 +89,7 @@ function panierPlus(index) {
 
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-300 rounded-box w-52">
             <li>
-              <RouterLink class="justify-between" :to="{name: 'login'}">
+              <RouterLink class="justify-between" :to="{name: 'commandes'}">
                 Vos commandes<span class="badge badge-accent">A FAIRE</span>
               </RouterLink>
             </li>

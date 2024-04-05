@@ -4,19 +4,24 @@
     import StepInscription from '@/components/commander/StepInscription.vue';
     import StepLivraison from '@/components/commander/StepLivraison.vue';
     import StepPaiement from '@/components/commander/StepPaiement.vue';
+    import useCompteStore from "../store/compte.js";
     import { onMounted, ref, watchEffect } from 'vue';
     
-    const panierStore = usePanierStore()
+    const panierStore = usePanierStore()    
+    const compteStore = useCompteStore();
     
     const livraisons = ref([])
     const livraisonChoisis = ref(0)
+    const newAdresse = ref({})
     const step = ref('inscription')
 
+    //Pour l'affichage des prix
     function prixPresision2(prix){
         return parseFloat(prix).toFixed(2)
     }
 
-    
+    //Récupération des données
+    //-------------livraisons
     async function fetchLivraisons() {
         const livResponse = await fetch("https://apififa2.azurewebsites.net/api/livraison ", {
             method: "GET",
@@ -25,7 +30,34 @@
 
         livraisons.value = await livResponse.json()
     }
+    //--------adresse
+    const adresse = ref();
+    const ville = ref();
+    const pays = ref();
+    async function fetchAddresse() {
+        if(!compteStore.utilisateur[0].adresseId)
+            return;
+        const adrResponse = await fetch("https://apififa2.azurewebsites.net/api/adresse/getbyid/"+compteStore.utilisateur[0].adresseId, {
+            method: "GET",
+            mode: "cors"
+        })
 
+        adresse.value = await adrResponse.json()
+        const vilResponse = await fetch("https://apififa2.azurewebsites.net/api/ville/getbyid/"+adresse.value.villeId, {
+            method: "GET",
+            mode: "cors"
+        })
+
+        ville.value = await vilResponse.json()
+        const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays/getbyid/"+ville.value.paysId, {
+            method: "GET",
+            mode: "cors"
+        })
+
+        pays.value = await paysResponse.json()
+    }
+
+    onMounted(fetchAddresse)
     onMounted(fetchLivraisons)
 
     function scrollTop(){
@@ -39,6 +71,9 @@
 
     }
 
+    //Insertion dans la base de donnée
+    
+
 </script>
 
 <template>
@@ -48,7 +83,7 @@
         <!-- Partie gauche -->
         <div class="flex items-center  flex-col w-7/12 bg-base-200 p-2 mr-1" >
             
-            <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" ></StepInscription>
+            <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" :adresse="adresse" :ville="ville" :pays="pays"></StepInscription>
             <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis" :livraisons="livraisons"></StepLivraison>
             <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'"></StepPaiement>
         </div>
