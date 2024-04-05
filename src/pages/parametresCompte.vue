@@ -1,22 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
+import { useRouter } from "vue-router"
+const router = useRouter()
 
 const compteStore = useCompteStore()
 const donneesCompte = ref()
 
-const deleteButtonClass = "bg-red-500 text-white hover:bg-white hover:text-black border border-red-500 rounded-lg py-2 px-4 duration-75"
-const basicButtonClass = "bg-gray-500 text-white hover:bg-white hover:text-black border border-gray-500 rounded-lg py-2 px-4 duration-75"
-
-// Ce code ne fonctionnera qu'avec le version non-sécurisée de l'api
+const deleteButtonClass = "block bg-red-500 text-white hover:bg-white hover:text-black border border-red-500 rounded-lg py-2 px-4 duration-75 my-2"
+const basicButtonClass = "block bg-gray-500 text-white hover:bg-white hover:text-black border border-gray-500 rounded-lg py-2 px-4 duration-75 my-2"
 
 async function fetchCompteData() {
 
-    console.log(compteStore.utilisateur);
-
     const response = await fetch("https://apififa2.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
         method: "GET",
-        mode: "no-cors",
         headers: {
             "Authorization": `Bearer ${compteStore.token}`,
             "Content-Type": "application/json",
@@ -24,8 +21,6 @@ async function fetchCompteData() {
     })
 
     donneesCompte.value = await response.json()
-
-    console.log(donneesCompte.value)
 }
 
 onMounted(fetchCompteData)
@@ -39,7 +34,9 @@ async function supprimerCompte() {
         }
     })
     
+    // on se déconnecte et on va à la page d'accueil :
     compteStore.disconnect()
+    router.push({ "name" : "index" })   
 }
 </script>
 
@@ -61,12 +58,14 @@ async function supprimerCompte() {
     <p v-if="donneesCompte.utilisateurCompte.commandesUtilisateur">Vous avez des commandes !</p>
     <p v-else>Vous n'avez pas de commandes pour le moment</p>
 
-    <RouterLink :class="basicButtonClass" :to="{name: 'donnees-bancaires'}">
-        Modifier mes données bancaires
-    </RouterLink>
+    <button :class="basicButtonClass">  <!-- Sans utilisation du bouton le css fait des trucs bizarres -->
+        <RouterLink :to="{name: 'donnees-bancaires'}">Modifier mes données bancaires</RouterLink>
+    </button>
 
     <button :class="deleteButtonClass" @click="supprimerCompte">Supprimer le compte</button>
 
 </div>
+
+<p v-else>Chargement...</p>
 
 </template>

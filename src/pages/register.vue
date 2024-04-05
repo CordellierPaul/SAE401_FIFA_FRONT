@@ -288,19 +288,19 @@ export async function emailEstDansLaBaseDeDonnees(email) {
                 <p>Prénom</p>
                 <label class="input input-bordered flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" /></svg>
-                    <input type="text" class="grow" placeholder="Prénom" v-model="compte.comptePrenom" />
+                    <input type="text" class="grow" placeholder="Prénom" v-model="compte.comptePrenom" id="inputPrenom" />
                 </label>
                 <p>Nom de famille</p>
                 <label class="input input-bordered flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" /></svg>
-                    <input type="text" class="grow" placeholder="Nom de famille" v-model="compte.compteNom" />
+                    <input type="text" class="grow" placeholder="Nom de famille" v-model="compte.compteNom" id="inputNom" />
                 </label>
                 <p>Date de naissance</p>
                 <label class="input input-bordered flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-4 h-4 opacity-70">
                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
                     </svg>
-                    <input type="date" class="grow" placeholder="Date de naissance" v-model="compte.dateDeNaissance" />
+                    <input type="date" class="grow" placeholder="Date de naissance" v-model="compte.dateDeNaissance" id="inputDateDeNaissance" />
                 </label>
                 <p>Pays de naissance</p>
                 <label class="input input-bordered flex items-center gap-2" v-if="listePays">
@@ -355,7 +355,7 @@ export async function emailEstDansLaBaseDeDonnees(email) {
             <li :class="styleCondition12Caracteres">Le mot de passe avoir au minimum 12 caractères</li>
         </ul>
 
-        <button class="btn btn-accent m-5" @click="boutonCreationCompte">CRÉER LE COMPTE</button>
+        <button id="btnCreationCompte" class="btn btn-accent m-5" @click="boutonCreationCompte">CRÉER LE COMPTE</button>
         <div class="m-5 flex items-center justify-center flex-col *:m-3">
             <p>Vous avez déjà un compte ?</p>
             <RouterLink :to="{name: 'login'}" class="btn btn-secondary">SE CONNECTER</RouterLink>
