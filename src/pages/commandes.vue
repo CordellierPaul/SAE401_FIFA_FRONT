@@ -1,44 +1,60 @@
 <script setup>
-    import { getRequest } from '@/composable/httpRequests';
-    import { ref, onMounted } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
-    import useCompteStore from "../store/compte.js";
+  import { ref, onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
+  import useCompteStore from "../store/compte.js";
 
-
-    const compteStore = useCompteStore();
-
-
-    const router = useRouter();
-    const route = useRoute();
-
-
-    const commandes = ([])
-
+  const compteStore = useCompteStore();
+  const router = useRouter();
+  const commandes = ref([]);
+  //const userId = compteStore.utilisateur[0].utilisateurId
+  const userId = 1
 
     async function fetchCommandes() {
         try {
-        const responseCommande = await fetch(`https://apififa2.azurewebsites.net/api/Commande/`, {
-            method: 'GET',
-            mode: 'cors'
-        });
+            const responseCommande = await fetch(`https://apififa2.azurewebsites.net/api/Commande/GetCommandesByUserId/${userId}`, {
+                method: 'GET',
+                mode: 'cors'
+            });
 
-        joueurs.value = await responseCommande.json();
 
+            commandes.value = await responseCommande.json();
 
         } catch (error) {
-        console.error('Erreur lors de la récupération des joueurs :', error);
+            console.error('Erreur lors de la récupération des commandes :', error);
         }
     }
 
     onMounted(async () => {
-      await fetchCommandes();
+        await fetchCommandes();
     })
 
+    function voirDetails(commande) {
+        router.push({ name: 'commande', params: { id: commande.commandeId } });
+    }
 </script>
 
-
 <template>
-
-
-
+    <template v-if="commandes.length > 0">
+        <table class="table table-zebra">
+        <thead>
+            <tr>
+            <th>Date de commande</th>
+            <th>État de commande</th>
+            <th>Date de livraison</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(commande, index) in commandes" :key="index">
+            <td>{{ commande.commandeDateCommande }}</td>
+            <td>{{ commande.commandeEtatCommande }}</td>
+            <td>{{ commande.commandeDateLivraison }}</td>
+            <td><button @click="voirDetails(commande)">Voir plus</button></td>
+            </tr>
+        </tbody>
+        </table>
+    </template>
+    <template v-else>
+        <div>Vous n'avez effectué aucune commande...</div>
+    </template>
 </template>

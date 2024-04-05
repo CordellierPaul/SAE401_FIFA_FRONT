@@ -113,6 +113,14 @@ const routes = [
       component: () => import('@/pages/commandes.vue')
     },
     {
+      path: '/commande/:id',
+      name: 'commande',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/pages/commande.vue')
+    },
+    {
       path: '/parametres-compte',
       name: 'parametres-compte',
       component: () => import('@/pages/parametresCompte.vue')
