@@ -17,7 +17,7 @@
                 <p class="input input-bordered w-full ">Nom : {{ compteStore.utilisateur[0].utilisateurNomAcheteur }}</p>
             </div>
             <div v-else>
-                <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " />
+                <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " v-model="inscription.keyNomAcheteur"/>
                 <div class="label ">
                     <span class="label-text-alt text-red-500">Le nom est obligatoire.</span>
                     <span class="label-text-alt ">
@@ -28,7 +28,7 @@
                 <p class="input input-bordered w-full ">Telephone : {{ compteStore.utilisateur[0].utilisateurTelAcheteur }}</p>
             </div>
             <div v-else>
-                <input type="text" required  placeholder="Téléphone" class="input input-bordered w-full " pattern="[0]{1}[0-9]{9}"/>
+                <input type="text" required  placeholder="Téléphone" class="input input-bordered w-full " pattern="[0]{1}[0-9]{9}" v-model="inscription.keyTelAcheteur" title="Le numro est composer de 10 chifres et commence par 0." />
                 <div class="label ">
                     <span class="label-text-alt text-red-500">Le téléphone est obligatoire.</span>
                     <span class="label-text-alt ">
@@ -39,18 +39,19 @@
         
         <p class="text-xl font-medium">ADRESSE DE LIVRAISON</p>
         <div class="*:my-2 w-full" v-if="!compteStore.utilisateur[0].adresseId">
-            <select class="select select-bordered w-full" placeholder="Pays">
+            <!-- <select class="select select-bordered w-full" placeholder="Pays">
                 <option >France</option>
                 <option >Belgique</option>
                 <option>Suisse</option>
                 <option>Italie</option>
-            </select>
+            </select> -->
             
-            <input type="text" required placeholder="Adresse" class="input input-bordered w-full " />
+            <input type="text" required placeholder="Pays" class="input input-bordered w-full " v-model="inscription.keyPays"/>
+            <input type="text" required placeholder="Adresse" class="input input-bordered w-full " v-model="inscription.keyNomAdresse"/>
 
             <div class="flex gap-2">
-                <input type="text" required placeholder="Code postal" class="input input-bordered w-full " />
-                <input type="text" required placeholder="Ville" class="input input-bordered w-full " />
+                <input type="text" required placeholder="Code postal" class="input input-bordered w-full " v-model="inscription.keyVilleCP" title="Code a 5 chiffres." pattern="[0-9]{5}">
+                <input type="text" required placeholder="Ville" class="input input-bordered w-full " v-model="inscription.keyVilleNom"/>
             </div>
 
         </div>
@@ -75,6 +76,7 @@
 <script setup>
     import { defineModel, ref } from "vue";
     import useCompteStore from "../../store/compte.js";
+import { verifierMotDePasse } from "@/composable/hashageMdp";
     
     // const adresse = ref();
     // const ville = ref();
@@ -85,7 +87,7 @@
         pays: Object,
     });
     
-    const newAdresse = defineModel()
+    const inscription = defineModel()
     const villeChoisis = ref()
     const paysChoisis = ref()
     // const villes = ref()
@@ -124,7 +126,91 @@
 
      const emit = defineEmits(['next'])
 
-    function btClick() {
+     async function verifChamps(){
+        //Vérification Coordonées
+        //--------Nom
+        if(compteStore.utilisateur[0].utilisateurNomAcheteur == null){
+            if(inscription.value.keyNomAcheteur == '' ){
+                return false;
+            }
+        }
+        // ------Tel
+        if(compteStore.utilisateur[0].utilisateurTelAcheteur == null){
+            if(inscription.value.keyTelAcheteur.length != 10 ){
+                return false;
+            }
+            else{
+                var re = new RegExp("^([0]{1}[0-9]{9})$");
+                if (! re.test(inscription.value.keyTelAcheteur))  {
+                    return false;
+                }
+            }
+        }
+        //Vérification adresse
+        if(compteStore.utilisateur[0].adresseId == null){
+            //Vérification VilleNom
+            if(inscription.value.keyVilleNom.length != 0){
+                const ville = ref();
+                try {
+                    const vilResponse = await fetch("https://apififa2.azurewebsites.net/api/ville/getbynom/"+inscription.value.keyVilleNom, {
+                    method: "GET",
+                    mode: "cors"
+                })
+            
+                ville.value = await vilResponse.json()           
+            
+                } catch (error) {
+                    return false;
+                }
+                
+                // if(ville.value == null){
+                //     return false;
+                // }
+                // else{
+                //     // inscription.value.keyVilleNom = ville
+                // }
+            }
+            else{
+                return false;
+            }
+
+            //Vérification Pays
+            if(inscription.value.keyPays.length != 0){
+                const pays = ref();
+                try {
+                    const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays/getbynom/"+inscription.value.keyPays, {
+                    method: "GET",
+                    mode: "cors"
+                })
+            
+                pays.value = await paysResponse.json()
+            
+            
+                } catch (error) {
+                    return false;
+                }
+                // if(pays.value == null){
+                //     return false;
+                // }
+                // else{
+                //     // inscription.value.keyPays = pays
+                // }
+            }
+            else{
+                return false;
+            }
+            //Vérification AdresseRue
+            if(inscription.value.keyNomAdresse.length == 0){
+                return false;
+            }
+        }
+        return true;
+     }
+
+    async function btClick() {
+        if(!await verifChamps()){
+            return;
+        }
         emit('next')
     }
 </script>
