@@ -12,7 +12,13 @@
     
     const livraisons = ref([])
     const livraisonChoisis = ref(0)
-    const newAdresse = ref({})
+    const inscription = ref({})
+    inscription.value.keyNomAcheteur = ''
+    inscription.value.keyTelAcheteur = ''
+    inscription.value.keyPays = ''
+    inscription.value.keyVilleNom = ''
+    inscription.value.keyVilleCP = ''
+    inscription.value.keyNomAdresse = ''
     const step = ref('inscription')
 
     //Pour l'affichage des prix
@@ -70,6 +76,27 @@
         });
 
     }
+    
+    function test(){
+        var dict = ref({})
+
+        // dict.value.push({
+        //     key:   "keyName",
+        //     value: "the value"
+        // });
+        dict.value.key = "nouvelle valeur"
+        dict.value.key1 = "nouvelle clé"
+        console.log(dict.value)
+        dict.value.key = "val2"
+        console.log(dict.value)
+        // dict.value.push({
+        //     key : "test2",
+        //     value : livraisons[0]
+        // })
+        // console.log(dict.value)
+        console.log("key2" in dict.value)
+
+    }
 
     //Insertion dans la base de donnée
     
@@ -83,7 +110,7 @@
         <!-- Partie gauche -->
         <div class="flex items-center  flex-col w-7/12 bg-base-200 p-2 mr-1" >
             
-            <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" :adresse="adresse" :ville="ville" :pays="pays"></StepInscription>
+            <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" :adresse="adresse" :ville="ville" :pays="pays" v-model="inscription"></StepInscription>
             <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis" :livraisons="livraisons"></StepLivraison>
             <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'"></StepPaiement>
         </div>
@@ -98,12 +125,13 @@
             <div class="">
                 <div class="bg-base-200 p-5">
                     <p class="font-semibold">Utiliser un code promo</p>
+                    {{ inscription }}
                     <div class="my-2">
         
                         <p class="text-xs pb-1">Votre code:</p>
                         <div class="flex">
                             <input type="text" placeholder="Code promo" class="input input-bordered w-full max-w-xs mx-2" />
-                            <input type="button" class="btn btn-accent text-white" value="Valider">
+                            <input type="button" class="btn btn-accent text-white" value="Valider" @click="test">
                         </div>
                     </div>
                 </div>
