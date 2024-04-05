@@ -8,15 +8,10 @@ const donneesCompte = ref()
 const deleteButtonClass = "bg-red-500 text-white hover:bg-white hover:text-black border border-red-500 rounded-lg py-2 px-4 duration-75"
 const basicButtonClass = "bg-gray-500 text-white hover:bg-white hover:text-black border border-gray-500 rounded-lg py-2 px-4 duration-75"
 
-// Ce code ne fonctionnera qu'avec le version non-sécurisée de l'api
-
 async function fetchCompteData() {
-
-    console.log(compteStore.utilisateur);
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
         method: "GET",
-        mode: "no-cors",
         headers: {
             "Authorization": `Bearer ${compteStore.token}`,
             "Content-Type": "application/json",
@@ -24,8 +19,6 @@ async function fetchCompteData() {
     })
 
     donneesCompte.value = await response.json()
-
-    console.log(donneesCompte.value)
 }
 
 onMounted(fetchCompteData)
