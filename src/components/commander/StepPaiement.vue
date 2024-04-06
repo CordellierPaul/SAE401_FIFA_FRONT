@@ -10,6 +10,7 @@
 
         <p class="text-xl">Paiement</p>
         <p>Toutes les transactions sont chiffrées et sécurisées.</p>
+        {{ inscription? inscription : '' }}
 
         <div class="bg-base-300 p-3 *:my-1 rounded-lg w-full">
             <div class="flex justify-between ">
@@ -34,12 +35,12 @@
                 </div>
             </div>
             <div v-else>
-                <input type="text" required placeholder="Numéro de carte" pattern="[0-9]{12}" class="input input-bordered w-full " title="12 chiffres"/>
-                <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " />
+                <input type="text" required placeholder="Numéro de carte" pattern="[0-9]{12}" class="input input-bordered w-full " title="12 chiffres" v-model="donneesBancaire.keyNumCarte"/>
+                <input type="text" required placeholder="Nom Complet" class="input input-bordered w-full " v-model="donneesBancaire.keyNomCarte"/>
     
                 <div class="flex gap-2">     
-                    <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." />
-                    <input type="text" required placeholder="Date d'expiration (MM/AA)" class="input input-bordered w-full " title="Format MM/AA, la date doit être supérieur à celle d'aujourd'hui."/>
+                    <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." v-model="donneesBancaire.keyCVV"/>
+                    <input type="text" required placeholder="Date d'expiration (MM/AA)" class="input input-bordered w-full " title="Format MM/AA, la date doit être supérieur à celle d'aujourd'hui." v-model="donneesBancaire.keyDate"/>
                 </div>                
             </div>
         </div>
@@ -51,14 +52,14 @@
             <div class="*:my-2 *:flex *:w-full *:justify-between">
                 <div>
                     <div class="flex gap-2">
-                        <input type="radio" name="enregistreCb" id="eNon" class="radio" value="0" checked/>
+                        <input type="radio" name="enregistreCb" id="eNon" class="radio" value="0" checked v-model="donneesBancaire.keyEnregistre"/>
                         <label for="eNon">Ne pas enregistrer.</label>
                     </div>
                 </div>
                 <div class="divider"></div> 
                 <div >
                     <div class="flex gap-2">
-                        <input type="radio" name="enregistreCb" id="eOk" class="radio" value="1" v-model="livraisonChoisis"/>
+                        <input type="radio" name="enregistreCb" id="eOk" class="radio" value="1" v-model="donneesBancaire.keyEnregistre"/>
                         <label for="eOk">Enregistrer.</label>
                     </div>
                 </div>
@@ -106,7 +107,7 @@
 
         <div class="flex gap-2 justify-between mt-2">
             <button @click="btPreviousClick" class="btn w-1/12 bg-secondary text-white"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="btn w-10/12 btn-accent text-white">Payer Maintenant</button>
+            <button class="btn w-10/12 btn-accent text-white" @click="valideCommande">Payer Maintenant</button>
 
         </div>
 
@@ -116,13 +117,23 @@
 
 <script setup>
 import {ref, defineProps} from 'vue'
+import usePanierStore from "../../store/panier.js"
+import useCompteStore from "../../store/compte.js";
+
+
+const panierStore = usePanierStore()    
+const compteStore = useCompteStore();
 const emit = defineEmits(['next','previous'])
 
 const props = defineProps({
-    cb: Object
+    cb: Object,
+    livraisons : Object,
+    livraisonChoisis: Object,
+    inscription: Object,
+    prixCmd: Object
 });
 
-const newCb = defineModel()
+const donneesBancaire = defineModel()
 
 function btPreviousClick() {
     emit('previous')
@@ -138,5 +149,167 @@ function hideInput(){
         adresseInputClass.value = "hidden"
 }
 
+
+async function valideCommande() {
+    //Récupération des données
+    let userNeedUpdate = false;
+    const utilisateur = compteStore.utilisateur[0]
+    const utilisateurId = compteStore.utilisateur[0].utilisateurId
+    const livraisonId = props.livraisons[parseInt(props.livraisonChoisis)].livraisonId
+    //------Récupération de l'adresse
+    let adresseId = null
+    let commandeId = null
+    if(compteStore.utilisateur[0].adresseId != null){
+        adresseId = compteStore.utilisateur[0].adresseId
+    }
+    else{     
+        userNeedUpdate = true;
+        let villeId = props.inscription.keyVille.villeId;
+
+        let rue = props.inscription.keyNomAdresse;
+        let adresse = {
+            adresseRue: rue,
+            villeId : villeId
+        } 
+        const response = await fetch("https://apififa2.azurewebsites.net/api/adresse", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(adresse)
+        })
+
+        if (response.status == 201) {
+
+            // récupération de  l'id de l'adresse ----TODO
+            let data = await response.json()
+             adresseId = data.adresseId;
+             utilisateur.adresseId = adresseId
+
+        } else {
+            console.warn("réponse non gérée " + response.status + "\n" + response)
+        }
+    }
+
+    //Mise à jour de l'utilisateur
+    if(props.inscription.keyNomAcheteur){
+        userNeedUpdate = true;
+        utilisateur.UtilisateurNomAcheteur = props.inscription.keyNomAcheteur
+    }
+    if(props.inscription.keyTelAcheteur){
+        userNeedUpdate = true;
+        utilisateur.UtilisateurNomAcheteur = props.inscription.keyTelAcheteur
+    }
+
+    if(userNeedUpdate){
+        try {
+          const response = await fetch('https://apififa2.azurewebsites.net/api/Utilisateur/'+utilisateur.utilisateurId, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(utilisateur)
+          });
+        } catch (error) {
+          console.error('Erreur lors de la requête fetch :', error);
+        }
+    }
+
+    // Insertion commande
+    var date = new Date();
+    let commande ={
+        utilisateurId : utilisateurId,
+        adresseId : adresseId,
+        LivraisonId : livraisonId,
+        commandePrix : props.prixCmd,
+        CommandeDateCommande : date.toJSON(),
+        CommandeEtatCommande : "En cours"
+    }
+    const responseCommande = await fetch("https://apififa2.azurewebsites.net/api/commande", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(commande)
+    })
+
+    if (responseCommande.status == 201) {
+        // récupération de  l'id de la commande ----TODO
+        let data = await responseCommande.json()
+         commandeId = data.commandeId;
+    } else {
+        console.warn("réponse non gérée " + responseCommande.status + "\n" + responseCommande)
+    }
+
+    //Insertion reglement
+    let reglement = {
+        CommandeId : commandeId,
+        ReglementMontant : props.prixCmd,
+        ReglementDate : date.toJSON(),
+    }
+    
+    // ---- FONCTIONNE
+    const response = await fetch("https://apififa2.azurewebsites.net/api/reglement", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reglement)
+    })
+
+    //Inséré les ligne commandes
+    let vpdId = null;
+    let tailleId = null;
+    let quantite = null;
+    let prixligne = null;
+    let lcd = null;
+    for (let index = 0; index< panierStore.produits.length; index++){
+        vpdId = panierStore.variantes[index].varianteProduitId;
+        tailleId = panierStore.stocks[index].tailleId;
+        quantite = panierStore.quantites[index];
+        prixligne = panierStore.variantes[index].varianteProduitPrix * panierStore.quantites[index];
+        lcd = {
+            CommandeId: commandeId,
+            NumeroLigneCommande: index+1,
+            VarianteProduitId : vpdId,
+            TailleId : tailleId,
+            LigneCommandeQuantite: quantite,
+            LigneCommandePrix: prixligne
+        }
+
+        //Insère les lignes
+        const response = await fetch("https://apififa2.azurewebsites.net/api/lignecommande", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(lcd)
+        })
+
+        if (response.status != 201) {
+            console.warn("réponse non gérée " + response.status + "\n" + response)
+        }
+
+        //Baisse le stock
+        let stock = panierStore.stocks[index]
+        stock.quantiteStockee = stock.quantiteStockee-panierStore.quantites[index]
+        try {
+          const response = await fetch('https://apififa2.azurewebsites.net/api/Stock/'+stock.stockId, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(stock)
+          });
+        } catch (error) {
+          console.error('Erreur lors de la requête fetch :', error);
+        }
+
+    }      
+  }
 
 </script>

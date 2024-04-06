@@ -163,12 +163,12 @@ import { verifierMotDePasse } from "@/composable/hashageMdp";
                     return false;
                 }
                 
-                // if(ville.value == null){
-                //     return false;
-                // }
-                // else{
-                //     // inscription.value.keyVilleNom = ville
-                // }
+                if(ville.value == null){
+                    return false;
+                }
+                else{
+                    inscription.value.keyVille = ville
+                }
             }
             else{
                 return false;
@@ -189,12 +189,12 @@ import { verifierMotDePasse } from "@/composable/hashageMdp";
                 } catch (error) {
                     return false;
                 }
-                // if(pays.value == null){
-                //     return false;
-                // }
-                // else{
-                //     // inscription.value.keyPays = pays
-                // }
+                if(pays.value == null){
+                    return false;
+                }
+                else{
+                    inscription.value.keyPaysJson = pays
+                }
             }
             else{
                 return false;

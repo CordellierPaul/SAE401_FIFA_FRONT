@@ -13,12 +13,9 @@
     const livraisons = ref([])
     const livraisonChoisis = ref(0)
     const inscription = ref({})
-    inscription.value.keyNomAcheteur = ''
-    inscription.value.keyTelAcheteur = ''
-    inscription.value.keyPays = ''
-    inscription.value.keyVilleNom = ''
-    inscription.value.keyVilleCP = ''
-    inscription.value.keyNomAdresse = ''
+    const donneesBancaire = ref({})
+    donneesBancaire.value.keyEnregistre = "0"
+
     const step = ref('inscription')
 
     //Pour l'affichage des prix
@@ -112,7 +109,7 @@
             
             <StepInscription  v-if="step === 'inscription'" @next="step = 'livraison'" :adresse="adresse" :ville="ville" :pays="pays" v-model="inscription"></StepInscription>
             <StepLivraison  v-if="step === 'livraison'" @next="step = 'paiement'" @previous="step = 'inscription'" v-model="livraisonChoisis" :livraisons="livraisons"></StepLivraison>
-            <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'"></StepPaiement>
+            <StepPaiement  v-if="step === 'paiement'"  @previous="step = 'livraison'" v-model="donneesBancaire" :livraisons="livraisons" :livraisonChoisis="livraisonChoisis" :inscription="inscription" :prixCmd="parseFloat(panierStore.sousTotal) + livraisons[livraisonChoisis].livraisonPrix"></StepPaiement>
         </div>
 
         <!-- Partie droite -->
