@@ -39,12 +39,6 @@
         
         <p class="text-xl font-medium">ADRESSE DE LIVRAISON</p>
         <div class="*:my-2 w-full" v-if="!compteStore.utilisateur[0].adresseId">
-            <!-- <select class="select select-bordered w-full" placeholder="Pays">
-                <option >France</option>
-                <option >Belgique</option>
-                <option>Suisse</option>
-                <option>Italie</option>
-            </select> -->
             
             <input type="text" required placeholder="Pays" class="input input-bordered w-full " v-model="inscription.keyPays"/>
             <input type="text" required placeholder="Adresse" class="input input-bordered w-full " v-model="inscription.keyNomAdresse"/>
@@ -76,11 +70,7 @@
 <script setup>
     import { defineModel, ref } from "vue";
     import useCompteStore from "../../store/compte.js";
-import { verifierMotDePasse } from "@/composable/hashageMdp";
-    
-    // const adresse = ref();
-    // const ville = ref();
-    // const pays = ref();
+
     const props = defineProps({
         adresse: Object,
         ville: Object,
@@ -88,40 +78,6 @@ import { verifierMotDePasse } from "@/composable/hashageMdp";
     });
     
     const inscription = defineModel()
-    const villeChoisis = ref()
-    const paysChoisis = ref()
-    // const villes = ref()
-    // const pays = ref()
-    // let inputVille = ref("")
-    // let inputPays = ref("")
-
-    // function filteredListVille() {
-    //     return villes.filter((ville) =>
-    //         ville.villeNom.toLowerCase().includes(inputVille.value.toLowerCase())
-    //     );
-    // }
-    // function filteredListPays() {
-    //     return pays.filter((p) =>
-    //         p.paysNom.toLowerCase().includes(inputPays.value.toLowerCase())
-    //     );
-    // }
-    // // async function fetchAddresse() {
-    //     if(compteStore.utilisateur[0].adresseId)
-    //         return;
-    //     const paysResponse = await fetch("https://apififa2.azurewebsites.net/api/pays", {
-    //         method: "GET",
-    //         mode: "cors"
-    //     })
-
-    //     pays.value = await paysResponse.json()
-    //     const vilResponse = await fetch("https://apififa2.azurewebsites.net/api/ville", {
-    //         method: "GET",
-    //         mode: "cors"
-    //     })
-
-    //     villes.value = await vilResponse.json()
-    // }
-    // onMounted(fetchAddresse)
     const compteStore = useCompteStore();
 
      const emit = defineEmits(['next'])
