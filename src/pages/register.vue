@@ -215,7 +215,7 @@ async function boutonCreationCompte() {
         // On enregistre les données retournées, l'id du compte et le token pour lire les
         // données, dans compteStore
         let data = await response.json()
-        compteStore.connect(data.userDetails.compteId, data.token)
+        compteStore.connect(data.userDetails.compteId, data.token, data.userDetails.utilisateurCompte)
 
         router.push({ "name" : "index" })   // on va à la page d'accueil
 
