@@ -131,8 +131,8 @@ function panierPlus(index) {
               <!-- PANIER VIDE -->
               <div class="h-96" v-if="panierStore.count == 0">
                 <div class="h-full flex flex-col justify-center items-center">
-                    <p class="flex items-center font-bold text-2xl">Votre panier est vide !</p>
-                    <RouterLink :to="{name: 'produits'}" class="btn-block btn btn-primary">Visiter la boutique</RouterLink>
+                    <p class="flex items-center ">Votre panier est vide !</p>
+                    <RouterLink :to="{name: 'produits'}" class="btn-block btn btn-primary text-white">Visiter la boutique</RouterLink>
                 </div>
                 </div>
 
@@ -157,7 +157,7 @@ function panierPlus(index) {
                   </div>
                 </div>
                 <div v-if="compteStore.isConnected">
-                  <RouterLink :to="{name: 'commander'}" class="btn-block btn btn-primary">Payer la commande</RouterLink>
+                  <RouterLink :to="{name: 'commander'}" class="btn-block btn btn-primary text-white">Payer la commande</RouterLink>
                 </div>
                 <div v-else class="card-actions">
                   <RouterLink :to="{name: 'login'}" class="btn-block btn btn-primary">Connectez-vous pour passer commande</RouterLink>                  
