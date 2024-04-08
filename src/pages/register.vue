@@ -4,6 +4,8 @@ import { encrypter } from "../composable/hashageMdp"
 import { useRouter } from "vue-router"
 import { getRequest } from '../composable/httpRequests.js'
 import useCompteStore from "../store/compte.js";
+import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
+import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
 
 const compteStore = useCompteStore()
 
@@ -19,12 +21,7 @@ const compte = ref({
     compteMdp: ""
 })
 
-const classesPourListeCondition = {
-    "infomation": "list-image-[url(/images/icon/bulle-condition-info.png)]",
-    "respectee": "list-image-[url(/images/icon/bulle-condition-reussie.png)]",
-    "pasRespectee": "list-image-[url(/images/icon/bulle-condition-pas-respectee.png)]",
-    "cachee": "hidden"
-}
+const variablesDeVerificationMdp = ref()
 
 // Textes des classes conditions pour que l'e-mail soit correct
 const styleConditionEmailUnique = ref(classesPourListeCondition["cachee"])
@@ -39,91 +36,13 @@ const styleConditionPaysReseigne = ref(classesPourListeCondition["cachee"])
 const styleConditionDateNaissanceReseigne = ref(classesPourListeCondition["cachee"])
 const styleConditionUtilisateurMajeur = ref(classesPourListeCondition["cachee"])
 
-// Textes des classes conditions pour que le mot de passe soit correct
-const styleConditionMajuscule = ref(classesPourListeCondition["infomation"])
-const styleConditionMinuscule = ref(classesPourListeCondition["infomation"])
-const styleConditionCaractereSpecial = ref(classesPourListeCondition["infomation"])
-const styleConditionChiffre = ref(classesPourListeCondition["infomation"])
-const styleCondition12Caracteres = ref(classesPourListeCondition["infomation"])
-
 // On accède aux pays
 const listePays = ref([])
 getRequest(listePays, "https://apififa2.azurewebsites.net/api/pays")
 
-var idTimeoutVerificationMdp = null
-
-function onPasswordTyped() {
-    if (idTimeoutVerificationMdp != null) {
-        clearTimeout(idTimeoutVerificationMdp)
-    }
-    idTimeoutVerificationMdp = setTimeout(() => {
-        motDePasseVerifierConditions(compte.value.compteMdp)
-    }, 500)
-}
-
-// cette fonction met la couleur des puces de la liste des conditions
-function motDePasseVerifierConditions(motDePasse) {   
-
-    if (motDePasse == "") {
-        styleConditionMajuscule.value = classesPourListeCondition["infomation"]
-        styleConditionMinuscule.value = classesPourListeCondition["infomation"]
-        styleConditionCaractereSpecial.value = classesPourListeCondition["infomation"]
-        styleConditionChiffre.value = classesPourListeCondition["infomation"]
-        styleCondition12Caracteres.value = classesPourListeCondition["infomation"]
-        return false
-    }
-    
-    let motDePasseEstBon = true
-    
-    if (motDePasse == motDePasse.toLowerCase()) {
-        motDePasseEstBon = false
-        styleConditionMajuscule.value = classesPourListeCondition["pasRespectee"]
-    } else {
-        styleConditionMajuscule.value = classesPourListeCondition["respectee"]
-    }
-    
-    if (motDePasse == motDePasse.toUpperCase()) {
-        motDePasseEstBon = false
-        styleConditionMinuscule.value = classesPourListeCondition["pasRespectee"]
-    } else {
-        styleConditionMinuscule.value = classesPourListeCondition["respectee"]
-    }
-    
-    if (!motDePasse.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/)) {
-        motDePasseEstBon = false
-        styleConditionCaractereSpecial.value = classesPourListeCondition["pasRespectee"]
-    } else {
-        styleConditionCaractereSpecial.value = classesPourListeCondition["respectee"]
-    }
-    
-    if (!motDePasse.match(/[0-9]+/)) {
-        motDePasseEstBon = false
-        styleConditionChiffre.value = classesPourListeCondition["pasRespectee"]
-    } else {
-        styleConditionChiffre.value = classesPourListeCondition["respectee"]
-    }
-    
-    if (motDePasse.length < 12) {
-        motDePasseEstBon = false
-        styleCondition12Caracteres.value = classesPourListeCondition["pasRespectee"]
-    } else {
-        styleCondition12Caracteres.value = classesPourListeCondition["respectee"]
-    }
-    
-    idTimeoutVerificationMdp = null
-
-    return motDePasseEstBon
-}
-
 async function boutonCreationCompte() {
     
-    let lesConditionsSontRemplies = true
-
-    motDePasseVerifierConditions(compte.value.compteMdp)
-
-    if (!conditionsSontVerifieesPourMotDePasse(compte.value.compteMdp)) {
-        lesConditionsSontRemplies = false
-    }
+    let lesConditionsSontRemplies = variablesDeVerificationMdp.value.motDePasseEstCorrect
 
     if (formatEmailEstBon(compte.value.compteEmail)) {
         styleConditionFormatEmail.value = classesPourListeCondition["cachee"]
@@ -199,6 +118,8 @@ async function boutonCreationCompte() {
         }
     }
 
+    console.log("hop !");   // laaaaaaaaaaaaaaaaaaaa
+
     compte.value.compteMdp = ""
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/accescompte/inscription", {
@@ -215,7 +136,7 @@ async function boutonCreationCompte() {
         // On enregistre les données retournées, l'id du compte et le token pour lire les
         // données, dans compteStore
         let data = await response.json()
-        compteStore.connect(data.userDetails.compteId, data.token)
+        compteStore.connect(data.userDetails.compteId, data.token, data.userDetails.utilisateurCompte)
 
         router.push({ "name" : "index" })   // on va à la page d'accueil
 
@@ -226,37 +147,6 @@ async function boutonCreationCompte() {
 </script>
 
 <script>
-// Cette fonction retourne true si le mot de passe est valide est false sinon
-// Une fonction de vérification de mot de passe est fait deux fois pour les tests
-export function conditionsSontVerifieesPourMotDePasse(motDePasse) {   
-
-    if (motDePasse == "") {
-        return false
-    }
-
-    if (motDePasse == motDePasse.toLowerCase()) {
-        return false
-    }
-
-    if (motDePasse == motDePasse.toUpperCase()) {
-        return false
-    }
-
-    if (!motDePasse.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/)) {
-        return false
-    }
-
-    if (!motDePasse.match(/[0-9]+/)) {
-        return false
-    }
-
-    if (motDePasse.length < 12) {
-        return false
-    }
-
-    return true
-}
-
 export function formatEmailEstBon(email) {
     const regexEmail = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/
 
@@ -348,11 +238,7 @@ export async function emailEstDansLaBaseDeDonnees(email) {
             <li :class="styleConditionPaysReseigne">Votre pays doit être renseigné</li>
             <li :class="styleConditionDateNaissanceReseigne">La date de naissance doit être renseignée, chaque utilisateur doit être majeur</li>
             <li :class="styleConditionUtilisateurMajeur">Vous devez être majeur pour créer un compte</li>
-            <li :class="styleConditionMajuscule">Le mot de passe avoir au moins une majuscule</li>
-            <li :class="styleConditionMinuscule">Le mot de passe avoir au moins une minuscule</li>
-            <li :class="styleConditionCaractereSpecial">Le mot de passe avoir au moins un caractère spécial</li>
-            <li :class="styleConditionChiffre">Le mot de passe avoir au moins un chiffre</li>
-            <li :class="styleCondition12Caracteres">Le mot de passe avoir au minimum 12 caractères</li>
+            <VerificationMdpComponent :motDePasse="compte.compteMdp" ref="variablesDeVerificationMdp"></VerificationMdpComponent>
         </ul>
 
         <button id="btnCreationCompte" class="btn btn-accent m-5" @click="boutonCreationCompte">CRÉER LE COMPTE</button>
