@@ -6,6 +6,7 @@ export function encrypter(motDePasse) {
     return encyption.toString(Base64)
 }
 
+// Renvoie true si les deux mots de passes sont les mêmes
 export function verifierMotDePasse(motDePasseEnClair, motDePasseEncrypte) {
     let encyption = sha256(motDePasseEnClair).toString(Base64)
     return encyption === motDePasseEncrypte
