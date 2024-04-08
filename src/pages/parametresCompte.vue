@@ -12,6 +12,8 @@ const router = useRouter()
 const compteStore = useCompteStore()
 const donneesCompte = ref()
 
+const variablesDeVerificationMdp = ref()
+
 const bottonClass = "block text-white hover:bg-white hover:text-black border rounded-lg py-2 px-4 duration-75 my-2"
 
 const deleteButtonClass = bottonClass + " bg-red-500 border-red-500" 
@@ -194,7 +196,7 @@ async function enregistrerMdp() {
             <input id="verificationNouveauMdp" v-model="donnesPopupModicatMdp.verificationNouveauMdp" :class="inputClass" type="password">
         </div>
         <ul>
-            <!-- <VerificationMdpComponent/> TODO -->
+            <VerificationMdpComponent :motDePasse="donnesPopupModicatMdp.nouveauMdp" ref="variablesDeVerificationMdp"/>
             <li :class="stytleConditionMdpChampsVerificationDifferents">Les deux champs de mot de passe sont écrits différemment</li>
             <li :class="stytleConditionMdpUnChampVide">Un ou plusieurs champs sont vides, ne peux pas continuer</li>
             <li :class="stytleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
