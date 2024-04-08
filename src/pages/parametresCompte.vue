@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
 
-import { verifierMotDePasse } from "../composable/hashageMdp.js";
+import { verifierMotDePasse, encrypter } from "../composable/hashageMdp.js";
 import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
 import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
 
@@ -21,7 +21,6 @@ const basicButtonClass = bottonClass + " bg-gray-500 border-gray-500"
 
 const readonlyCompteDataClass = "inline-block py-1.5"
 const inputClass = "inline p-1 w-max border border-gray-200 rounded-lg text-s focus:ring-blue-500 focus:border-blue-500 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-const errorMessageClass = "pl-1 list-image-[url(/images/icon/bulle-condition-pas-respectee.png)] list-inside"
 
 var modificationCompteEnCours = ref(false)
 var popupModificationMdpAffichee = ref(false)
@@ -123,6 +122,13 @@ async function enregistrerMdp() {
         stytleConditionMdpActuelDifferent.value = classesPourListeCondition["pasRespectee"]
         return
     }
+
+    donneesCompte.value.compteMdp = encrypter(donnesPopupModicatMdp.value.nouveauMdp)
+
+    popupModificationMdpAffichee.value = false
+     
+    await enregistrerModifications()
+    await fetchCompteData()
 }
 </script>
 
