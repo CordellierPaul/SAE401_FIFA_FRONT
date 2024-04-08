@@ -44,6 +44,7 @@ function panierPlus(index) {
           <li><RouterLink :to="{name: 'contact'}">Contact</RouterLink></li>
           <li><RouterLink :to="{name: 'articles'}">Articles</RouterLink></li>
           <li><RouterLink :to="{name: 'clubs'}">Clubs</RouterLink></li>
+          <li><RouterLink :to="{name: 'classement'}">Classement</RouterLink></li>
           <li><RouterLink :to="{name: 'theme'}">Voter pour un theme</RouterLink></li>
         </ul>
       </div>
@@ -59,6 +60,7 @@ function panierPlus(index) {
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'produits'}">Produits</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'contact'}">Contact</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'clubs'}">Clubs</RouterLink></li>
+        <li><RouterLink class="text-white btn btn-primary" :to="{name: 'classement'}">Classement</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'articles'}">Articles</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'theme'}">Voter pour un theme</RouterLink></li>
       </ul>
@@ -131,8 +133,8 @@ function panierPlus(index) {
               <!-- PANIER VIDE -->
               <div class="h-96" v-if="panierStore.count == 0">
                 <div class="h-full flex flex-col justify-center items-center">
-                    <p class="flex items-center font-bold text-2xl">Votre panier est vide !</p>
-                    <RouterLink :to="{name: 'produits'}" class="btn-block btn btn-primary">Visiter la boutique</RouterLink>
+                    <p class="flex items-center ">Votre panier est vide !</p>
+                    <RouterLink :to="{name: 'produits'}" class="btn-block btn btn-primary text-white">Visiter la boutique</RouterLink>
                 </div>
                 </div>
 
@@ -146,23 +148,20 @@ function panierPlus(index) {
                       <p>Taille : {{ panierStore.getStocks[index-1].tailleStockee.tailleLibelle}}</p>
                       <div class="flex justify-between items-center">
                         <p class="text-base font-bold">{{ ((panierStore.getVariantes[index-1].varianteProduitPrix * (1- panierStore.getVariantes[index-1].varianteProduitPromo))* panierStore.getQuantites[index-1]).toFixed(2) }}</p>
-                        
                         <button class="btn btn-circle h-3 w-3" @click="panierStore.baisseQuantite(panierStore.getStocks[index-1])">-</button>
                         <p  class="bg-base-200 font-bold w-7">{{panierStore.getQuantites[index-1]}}</p>
                         <button class="btn btn-circle h-3 w-3" @click="panierPlus(index-1)">+</button>
                         <i class="fa-solid fa-trash ml-2" @click="panierStore.supprimeProduit(panierStore.getStocks[index-1])"></i>
                       </div>
-                      
                     </div>
                   </div>
                 </div>
                 <div v-if="compteStore.isConnected">
-                  <RouterLink :to="{name: 'commander'}" class="btn-block btn btn-primary">Payer la commande</RouterLink>
+                  <RouterLink :to="{name: 'commander'}" class="btn-block btn btn-primary text-white">Payer la commande</RouterLink>
                 </div>
                 <div v-else class="card-actions">
                   <RouterLink :to="{name: 'login'}" class="btn-block btn btn-primary">Connectez-vous pour passer commande</RouterLink>                  
                 </div>
-
               </div>
 
             </div>

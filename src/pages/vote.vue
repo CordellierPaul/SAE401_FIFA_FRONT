@@ -11,8 +11,10 @@
     const router = useRouter();
     const route = useRoute();
     const joueurs = ref([]);
+    const votes = ref([]);
     const theme = ref();
     const utilisateur = ref();
+    const dejaVote = false;
 
     async function fetchTheme() {
         try {
@@ -40,12 +42,12 @@
 
     async function fetchJoueurs() {
         try {
-        const responseTheme = await fetch(`https://apififa2.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
+        const responseJoueurs = await fetch(`https://apififa2.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
             method: 'GET',
             mode: 'cors'
         });
 
-        joueurs.value = await responseTheme.json();
+        joueurs.value = await responseJoueurs.json();
 
 
         } catch (error) {
@@ -53,16 +55,43 @@
         }
     }
 
-    //onMounted(fetchTheme);
-    //onMounted(fetchJoueurs);
+
+    async function fetchVotes() {
+        try {
+        const responseVote = await fetch(`https://apififa2.azurewebsites.net/api/Vote`, {
+            method: 'GET',
+            mode: 'cors'
+        });
+
+        votes.value = await responseVote.json();
+
+
+        } catch (error) {
+        console.error('Erreur lors de la récupération des votes :', error);
+        }
+    }
 
     onMounted(async () => {
       await fetchTheme();
       await fetchJoueurs();
+      await fetchVotes();
     })
 
 
     async function voter() {
+      for(var vote in votes.value){
+        if(vote.utilisateurId == parseInt(compteStore.utilisateur[0].utilisateurId,10) && vote.themeid == route.query.id){
+          dejaVote = true;
+
+          console.log(vote.utilisateurId)
+          //console.log(compteStore.utilisateur[0].utilisateurId)
+          //console.log(vote.themeId)
+          //console.log(route.query.id)
+          break;
+        }
+      }
+
+      if(!dejaVote){
       const selectedPlayers = new Set();
   
       // Récupérer les joueurs sélectionnés à partir des sélecteurs nommés
@@ -121,19 +150,16 @@
       votes.push(vote3);
 
 
-      console.log(JSON.stringify(votes));
-
       for (let vote of votes) {
-        console.log(vote);
         try {
-          const response = await fetch('https://apififa2.azurewebsites.net/api/Vote', {
+          const response = await fetch('https://apififa2.azurewebsites.net/api/Vote/Ajout', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(vote)
           });
-          console.log(response)
+
           if (!response.ok) {
             throw new Error('Erreur lors de la requête.');
           }
@@ -141,6 +167,9 @@
         } catch (error) {
           console.error('Erreur lors de la requête fetch :', error);
         }
+      }
+    }else{
+      my_modal_2.showModal();
     }
   }
 
@@ -219,6 +248,19 @@
         <div class="modal-box">
           <h3 class="font-bold text-lg">Attention!</h3>
           <p class="py-4">Vous devez choisir trois joueurs différents.</p>
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="btn">OK</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- FENETRE MODAL EN CAS DE VOTE DEJA FAIT -->
+      <dialog id="my_modal_2" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">Attention!</h3>
+          <p class="py-4">Vous ne pouvez pas modifier un vote déjà fait.</p>
           <div class="modal-action">
             <form method="dialog">
               <button class="btn">OK</button>
