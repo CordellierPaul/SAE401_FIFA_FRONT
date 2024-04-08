@@ -1,11 +1,15 @@
 <script setup>
 import { ref } from "vue"
-import { encrypter } from "../composable/hashageMdp"
 import { useRouter } from "vue-router"
+
+import { encrypter } from "../composable/hashageMdp.js"
 import { getRequest } from '../composable/httpRequests.js'
-import useCompteStore from "../store/compte.js";
+import { emailEstDansLaBaseDeDonnees, formatEmailEstBon } from "../composable/verificationEmail.js";
+
 import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
 import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
+
+import useCompteStore from "../store/compte.js";
 
 const compteStore = useCompteStore()
 
@@ -118,8 +122,6 @@ async function boutonCreationCompte() {
         }
     }
 
-    console.log("hop !");   // laaaaaaaaaaaaaaaaaaaa
-
     compte.value.compteMdp = ""
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/accescompte/inscription", {
@@ -143,28 +145,6 @@ async function boutonCreationCompte() {
     } else {
         console.warn("réponse non gérée " + response.status + "\n" + response)
     }
-}
-</script>
-
-<script>
-export function formatEmailEstBon(email) {
-    const regexEmail = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/
-
-    if (email.match(regexEmail)) {
-        return true
-    }
-
-    return false
-}
-
-export async function emailEstDansLaBaseDeDonnees(email) {
-
-    const response = await fetch("https://apififa2.azurewebsites.net/api/compte/EmailIsInDatabase/" + email, {
-        method: "GET",
-        mode: "cors"
-    })
-
-    return await response.json()
 }
 </script>
 

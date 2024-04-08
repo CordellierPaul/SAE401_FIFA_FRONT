@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
 
-import { verifierMotDePasse } from "../composable/hashageMdp.js";
+import { verifierMotDePasse, encrypter } from "../composable/hashageMdp.js";
 import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
 import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
 
@@ -12,6 +12,8 @@ const router = useRouter()
 const compteStore = useCompteStore()
 const donneesCompte = ref()
 
+const variablesDeVerificationMdp = ref()
+
 const bottonClass = "block text-white hover:bg-white hover:text-black border rounded-lg py-2 px-4 duration-75 my-2"
 
 const deleteButtonClass = bottonClass + " bg-red-500 border-red-500" 
@@ -19,7 +21,6 @@ const basicButtonClass = bottonClass + " bg-gray-500 border-gray-500"
 
 const readonlyCompteDataClass = "inline-block py-1.5"
 const inputClass = "inline p-1 w-max border border-gray-200 rounded-lg text-s focus:ring-blue-500 focus:border-blue-500 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-const errorMessageClass = "pl-1 list-image-[url(/images/icon/bulle-condition-pas-respectee.png)] list-inside"
 
 var modificationCompteEnCours = ref(false)
 var popupModificationMdpAffichee = ref(false)
@@ -121,6 +122,13 @@ async function enregistrerMdp() {
         stytleConditionMdpActuelDifferent.value = classesPourListeCondition["pasRespectee"]
         return
     }
+
+    donneesCompte.value.compteMdp = encrypter(donnesPopupModicatMdp.value.nouveauMdp)
+
+    popupModificationMdpAffichee.value = false
+     
+    await enregistrerModifications()
+    await fetchCompteData()
 }
 </script>
 
@@ -194,7 +202,7 @@ async function enregistrerMdp() {
             <input id="verificationNouveauMdp" v-model="donnesPopupModicatMdp.verificationNouveauMdp" :class="inputClass" type="password">
         </div>
         <ul>
-            <!-- <VerificationMdpComponent/> TODO -->
+            <VerificationMdpComponent :motDePasse="donnesPopupModicatMdp.nouveauMdp" ref="variablesDeVerificationMdp"/>
             <li :class="stytleConditionMdpChampsVerificationDifferents">Les deux champs de mot de passe sont écrits différemment</li>
             <li :class="stytleConditionMdpUnChampVide">Un ou plusieurs champs sont vides, ne peux pas continuer</li>
             <li :class="stytleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
