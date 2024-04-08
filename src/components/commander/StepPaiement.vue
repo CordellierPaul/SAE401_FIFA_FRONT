@@ -9,6 +9,7 @@
 
 
         <p class="text-xl">Paiement</p>
+        {{ compteStore.utilisateur[0].infosBancairesUtilisateur}}
         <p>Toutes les transactions sont chiffrées et sécurisées.</p>
 
         <div class="bg-base-300 p-3 *:my-1 rounded-lg w-full">
@@ -28,7 +29,7 @@
                 <p type="text" required placeholder="Nom Complet" class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireNomCarte }}</p>
     
                 <div class="flex gap-2">     
-                    <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
+                    <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." v-model="donneesBancaire.keyCVV"/>
                     <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireAnneeExpiration }}</p>
                 </div>
             </div>
@@ -135,7 +136,6 @@ import usePanierStore from "../../store/panier.js"
 import { useRouter } from 'vue-router';
 import useCompteStore from "../../store/compte.js";
 
-
 const panierStore = usePanierStore()    
 const compteStore = useCompteStore()
 const router = useRouter();
@@ -187,17 +187,19 @@ async function validerPaiement(){
         panierStore.reset()
         modal_commande_valier.showModal();
     }
+    return;
 }
 
-//TODO
 function verifChamps(){
-    if(donneesBancaire.value.keyEnregistre == 1){
-    let date = new Date()
-    let moisActuelle = (date.getMonth()+1)%12
-    let anneeActuelle = parseInt(date.getFullYear().toString().substring(2))
-        let mmaa = donneesBancaire.value.keyDate.split('/') 
-        console.log(mmaa[1] == anneeActuelle)
-        console.log(anneeActuelle)
+    if(compteStore.utilisateur[0].infosBancairesUtilisateur.length === 0){
+        if(!donneesBancaire.value.keyDate){
+            return false
+        }
+        //Vérification de la date
+        let date = new Date()
+        let moisActuelle = (date.getMonth()+1)%12
+        let anneeActuelle = parseInt(date.getFullYear().toString().substring(2))
+        let mmaa = donneesBancaire.value.keyDate.split('/')
         if(mmaa[1] < anneeActuelle){
             return false
         }
@@ -205,7 +207,26 @@ function verifChamps(){
             if(mmaa[0]<moisActuelle)
                 return false
         }
-    }
+        if(donneesBancaire.value.keyNomCarte){
+            //Vérification nom carte
+            if(donneesBancaire.value.keyNomCarte.length <=0)
+                return false;
+        }
+        else
+            return false;
+        if(donneesBancaire.value.keyNumCarte){
+            //Vérification num
+            if(donneesBancaire.value.keyNumCarte.length != 12)
+                return false;
+        }
+        else
+            return false;
+    }    
+    //Vérification du CVV
+    if(!donneesBancaire.value.keyCVV)
+        return false
+    if (donneesBancaire.value.keyCVV.length != 3)
+        return false;
     return true;
 }
 
@@ -271,10 +292,11 @@ async function valideCommande() {
                 InfosBancaireMoisExpiration : mmaa[0],
                 InfosBancaireAnneeExpiration : mmaa[1],
             }
-            console.log(utilisateur.infosBancairesUtilisateur.contains(cb))
+            console.log(utilisateur.value.infosBancairesUtilisateur)
+            console.log(utilisateur.value.infosBancairesUtilisateur.contains(cb))
             donneesBancaire.value.keyEnregistre = 0
-            // if(!utilisateur.infosBancairesUtilisateur.contains(cb))
-            //     utilisateur.infosBancairesUtilisateur.push(cb)
+            if(!utilisateur.infosBancairesUtilisateur.contains(cb))
+                utilisateur.infosBancairesUtilisateur.unshift(cb)
         }
         console.log(JSON.stringify(utilisateur))
         donneesCompte.value.utilisateurCompte = utilisateur
