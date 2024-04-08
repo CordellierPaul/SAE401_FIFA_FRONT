@@ -113,6 +113,15 @@ const routes = [
       component: () => import('@/pages/clubs.vue')
     },
     {
+      path: '/classement',
+      name: 'classement',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/pages/classement.vue')
+    },
+    
+    {
       path: '/commandes',
       name: 'commandes',
       // route level code-splitting

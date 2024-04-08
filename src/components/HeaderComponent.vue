@@ -44,6 +44,7 @@ function panierPlus(index) {
           <li><RouterLink :to="{name: 'contact'}">Contact</RouterLink></li>
           <li><RouterLink :to="{name: 'articles'}">Articles</RouterLink></li>
           <li><RouterLink :to="{name: 'clubs'}">Clubs</RouterLink></li>
+          <li><RouterLink :to="{name: 'classement'}">Classement</RouterLink></li>
           <li><RouterLink :to="{name: 'theme'}">Voter pour un theme</RouterLink></li>
         </ul>
       </div>
@@ -59,6 +60,7 @@ function panierPlus(index) {
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'produits'}">Produits</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'contact'}">Contact</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'clubs'}">Clubs</RouterLink></li>
+        <li><RouterLink class="text-white btn btn-primary" :to="{name: 'classement'}">Classement</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'articles'}">Articles</RouterLink></li>
         <li><RouterLink class="text-white btn btn-primary" :to="{name: 'theme'}">Voter pour un theme</RouterLink></li>
       </ul>
