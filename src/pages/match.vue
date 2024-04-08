@@ -11,9 +11,13 @@
     const route = useRoute();
     const matchId = route.params.id;
     const match = ref([]);
+    const clubDomi = ref([]);
+    const clubExt = ref([]);
 
     async function fetchAll(){
         await getRequest(match, 'https://apififa2.azurewebsites.net/api/match/getbyid/' + matchId);
+        await getRequest(clubExt, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+props.match.clubExterieurId)
+        await getRequest(clubDomi, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+props.match.clubDomicileId)
     }
 
     onMounted(fetchAll)
