@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
+
 import { verifierMotDePasse } from "../composable/hashageMdp.js";
+import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
+import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
+
 import { useRouter } from "vue-router"
 const router = useRouter()
 
@@ -26,9 +30,9 @@ var donnesPopupModicatMdp = ref({
     verificationNouveauMdp: "",
 })
 
-var erreurMdpChampsVerificationDifferents = ref(false)
-var erreurMdpUnChampVide = ref(false)
-var erreurMdpActuelDifferent = ref(false)
+var stytleConditionMdpChampsVerificationDifferents = ref(classesPourListeCondition["cachee"])
+var stytleConditionMdpUnChampVide = ref(classesPourListeCondition["cachee"])
+var stytleConditionMdpActuelDifferent = ref(classesPourListeCondition["cachee"])
 
 async function fetchCompteData() {
 
@@ -88,33 +92,33 @@ function cacherPopup() {
     donnesPopupModicatMdp.value.mdpActuel = ""
     donnesPopupModicatMdp.value.nouveauMdp = ""
     donnesPopupModicatMdp.value.verificationNouveauMdp = ""
-    erreurMdpChampsVerificationDifferents.value = false
-    erreurMdpUnChampVide.value = false
-    erreurMdpActuelDifferent.value = false
+    stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["cachee"]
+    stytleConditionMdpUnChampVide.value = classesPourListeCondition["cachee"]
+    stytleConditionMdpActuelDifferent.value = classesPourListeCondition["cachee"]
 
     popupModificationMdpAffichee.value = false
 }
 
 async function enregistrerMdp() {
 
-    erreurMdpUnChampVide.value = false
-    erreurMdpChampsVerificationDifferents.value = false
-    erreurMdpActuelDifferent.value = false
+    stytleConditionMdpUnChampVide.value = classesPourListeCondition["cachee"]
+    stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["cachee"]
+    stytleConditionMdpActuelDifferent.value = classesPourListeCondition["cachee"]
 
     if (donnesPopupModicatMdp.value.ancienMdp == ""
         || donnesPopupModicatMdp.value.nouveauMdp == ""
         || donnesPopupModicatMdp.value.verificationNouveauMdp == "") {
-        erreurMdpUnChampVide.value = true
+        stytleConditionMdpUnChampVide.value = classesPourListeCondition["pasRespectee"]
         return
     }
 
     if (donnesPopupModicatMdp.value.nouveauMdp !== donnesPopupModicatMdp.value.verificationNouveauMdp) {
-        erreurMdpChampsVerificationDifferents.value = true
+        stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["pasRespectee"]
         return
     }
 
     if (!verifierMotDePasse(donnesPopupModicatMdp.value.mdpActuel, donneesCompte.value.compteMdp)) {
-        erreurMdpActuelDifferent.value = true
+        stytleConditionMdpActuelDifferent.value = classesPourListeCondition["pasRespectee"]
         return
     }
 }
@@ -190,9 +194,10 @@ async function enregistrerMdp() {
             <input id="verificationNouveauMdp" v-model="donnesPopupModicatMdp.verificationNouveauMdp" :class="inputClass" type="password">
         </div>
         <ul>
-            <li v-if="erreurMdpChampsVerificationDifferents" :class="errorMessageClass">Les deux champs de mot de passe sont écrits différemment</li>
-            <li v-if="erreurMdpUnChampVide" :class="errorMessageClass">Un champ est vide, ne peux pas continuer</li>
-            <li v-if="erreurMdpActuelDifferent" :class="errorMessageClass">Le mot de passe actuel est différent par rapport à celui écrit</li>
+            <!-- <VerificationMdpComponent/> TODO -->
+            <li :class="stytleConditionMdpChampsVerificationDifferents">Les deux champs de mot de passe sont écrits différemment</li>
+            <li :class="stytleConditionMdpUnChampVide">Un ou plusieurs champs sont vides, ne peux pas continuer</li>
+            <li :class="stytleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
         </ul>
         <div class="flex items-center justify-center space-x-2">
             <button :class="basicButtonClass" @click="cacherPopup">Annuler</button>

@@ -238,7 +238,7 @@ export async function emailEstDansLaBaseDeDonnees(email) {
             <li :class="styleConditionPaysReseigne">Votre pays doit être renseigné</li>
             <li :class="styleConditionDateNaissanceReseigne">La date de naissance doit être renseignée, chaque utilisateur doit être majeur</li>
             <li :class="styleConditionUtilisateurMajeur">Vous devez être majeur pour créer un compte</li>
-            <VerificationMdpComponent :motDePasse="compte.compteMdp" ref="variablesDeVerificationMdp"></VerificationMdpComponent>
+            <VerificationMdpComponent :motDePasse="compte.compteMdp" ref="variablesDeVerificationMdp"/>
         </ul>
 
         <button id="btnCreationCompte" class="btn btn-accent m-5" @click="boutonCreationCompte">CRÉER LE COMPTE</button>
