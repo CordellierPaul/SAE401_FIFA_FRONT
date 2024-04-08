@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue"
-import { formatEmailEstBon } from "./register.vue"
+import { formatEmailEstBon } from "../composable/verificationEmail.js"
 import { encrypter } from "../composable/hashageMdp"
 import { useRouter } from "vue-router"
 import useCompteStore from "../store/compte.js"
