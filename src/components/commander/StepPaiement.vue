@@ -30,7 +30,7 @@
     
                 <div class="flex gap-2">     
                     <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." v-model="donneesBancaire.keyCVV"/>
-                    <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireAnneeExpiration }}</p>
+                    <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].AnneeExpiration }}</p>
                 </div>
             </div>
             <div v-else>
@@ -280,9 +280,10 @@ async function valideCommande() {
         userNeedUpdate = true;
         utilisateur.utilisateurTelAcheteur = props.inscription.keyTelAcheteur
     }
-
+    console.log(donneesBancaire.value.keyEnregistre == 1)
+    if(donneesBancaire.value.keyEnregistre == 1)
+        userNeedUpdate = true;
     if(userNeedUpdate){
-        //TODO
         if(donneesBancaire.value.keyEnregistre == 1){
             let mmaa = donneesBancaire.value.keyDate.split('/') 
             let cb = {
@@ -290,18 +291,25 @@ async function valideCommande() {
                 InfosBancaireNumCarte : donneesBancaire.value.keyNumCarte,
                 InfosBancaireNomCarte : donneesBancaire.value.keyNomCarte,
                 InfosBancaireMoisExpiration : mmaa[0],
-                InfosBancaireAnneeExpiration : mmaa[1],
+                AnneeExpiration : mmaa[1],
             }
-            console.log(utilisateur.value.infosBancairesUtilisateur)
-            console.log(utilisateur.value.infosBancairesUtilisateur.contains(cb))
             donneesBancaire.value.keyEnregistre = 0
-            if(!utilisateur.infosBancairesUtilisateur.contains(cb))
+            if(!utilisateur.infosBancairesUtilisateur.includes(cb))
                 utilisateur.infosBancairesUtilisateur.unshift(cb)
+            //Ajout de la cb dans la base de données //TODO
+            const response = await fetch("https://apififa2.azurewebsites.net/api/InfosBancaires/", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${compteStore.token}`, 
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cb)
+            })
+
         }
-        console.log(JSON.stringify(utilisateur))
+        //Mise à jour utilisateur
         donneesCompte.value.utilisateurCompte = utilisateur
-        compteStore.utilisateur[0] = utilisateur
-        
+        compteStore.utilisateur[0] = utilisateur        
         const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "PUT",
         headers: {
@@ -309,7 +317,7 @@ async function valideCommande() {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(donneesCompte.value)
-    })
+        })
     }
 
     // Insertion commande
