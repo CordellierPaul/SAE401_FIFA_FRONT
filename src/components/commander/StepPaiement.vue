@@ -10,7 +10,7 @@
 
         <p class="text-xl">Paiement</p>
         <p>Toutes les transactions sont chiffrées et sécurisées.</p>
-        {{ inscription? inscription : '' }}
+        {{ compteStore? compteStore.utilisateur[0]: '' }}
 
         <div class="bg-base-300 p-3 *:my-1 rounded-lg w-full">
             <div class="flex justify-between ">
@@ -24,14 +24,14 @@
                     <p>American Express</p>
                 </div>
             </div>
-            <div v-if="cb">
-                {{ cb }}
-                <p type="text" class="input input-bordered w-full " >{{ cb? cb.NumeroCarte : '' }}</p>
-                <p type="text" required placeholder="Nom Complet" class="input input-bordered w-full " >{{ cb? cb.NomCarte :'' }}</p>
+            <div v-if="compteStore.utilisateur[0].infosBancairesUtilisateur.length >0">
+                {{ compteStore.utilisateur[0].infosBancairesUtilisateur[0] }}
+                <p type="text" class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireNumCarte}}</p>
+                <p type="text" required placeholder="Nom Complet" class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireNomCarte }}</p>
     
                 <div class="flex gap-2">     
                     <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
-                    <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
+                    <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireAnneeExpiration }}</p>
                 </div>
             </div>
             <div v-else>
@@ -45,7 +45,7 @@
             </div>
         </div>
         
-        <div v-if(!cb)>
+        <div v-if="compteStore.utilisateur[0].infosBancairesUtilisateur.length == 0">
             <!-- Enregistrer la carte -->
             <p class="text-xl">Enregistrer la carte pour vos prochaine commande</p>
 
@@ -126,7 +126,6 @@ const compteStore = useCompteStore();
 const emit = defineEmits(['next','previous'])
 
 const props = defineProps({
-    cb: Object,
     livraisons : Object,
     livraisonChoisis: Object,
     inscription: Object,
@@ -193,27 +192,45 @@ async function valideCommande() {
     }
 
     //Mise à jour de l'utilisateur
-    if(props.inscription.keyNomAcheteur){
+    if(props.inscription.value.keyNomAcheteur){
         userNeedUpdate = true;
-        utilisateur.UtilisateurNomAcheteur = props.inscription.keyNomAcheteur
+        utilisateur.utilisateurNomAcheteur = props.inscription.value.keyNomAcheteur
     }
-    if(props.inscription.keyTelAcheteur){
+    if(props.inscription.value.keyTelAcheteur){
         userNeedUpdate = true;
-        utilisateur.UtilisateurNomAcheteur = props.inscription.keyTelAcheteur
+        utilisateur.utilisateurTelAcheteur = props.inscription.value.keyTelAcheteur
     }
 
     if(userNeedUpdate){
-        try {
-          const response = await fetch('https://apififa2.azurewebsites.net/api/Utilisateur/'+utilisateur.utilisateurId, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(utilisateur)
-          });
-        } catch (error) {
-          console.error('Erreur lors de la requête fetch :', error);
+        // try {
+        //   const response = await fetch('https://apififa2.azurewebsites.net/api/Utilisateur/'+utilisateur.utilisateurId, {
+        //     method: "PUT",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(utilisateur)
+        //   });
+        // } catch (error) {
+        //   console.error('Erreur lors de la requête fetch :', error);
+        // }
+        if(donneesBancaire.value.keyEnregistre == 1){
+            let mmaa = donneesBancaire.value.keyDate.split('/') 
+            let cb = {
+                utilisateurId : utilisateurId,
+                InfosBancaireNumCarte : donneesBancaire.value.keyNumCarte,
+                InfosBancaireNomCarte : donneesBancaire.value.keyNomCarte,
+                InfosBancaireMoisExpiration : mmaa[0],
+                InfosBancaireAnneeExpiration : mmaa[1],
+            }
+            console.log(utilisateur.infosBancairesUtilisateur.contains(cb))
+            // if(!utilisateur.infosBancairesUtilisateur.contains(cb))
+            //     utilisateur.infosBancairesUtilisateur.push(cb)
         }
+        console.log(donneesBancaire.value.keyEnregistre)
+        console.log(utilisateur.infosBancairesUtilisateur)
+        console.log(utilisateur)
+        console.log(compteStore.utilisateur[0])
+        compteStore.utilisateur[0] = utilisateur
     }
 
     // Insertion commande
@@ -279,19 +296,19 @@ async function valideCommande() {
             LigneCommandeQuantite: quantite,
             LigneCommandePrix: prixligne
         }
-
+        console.log(JSON.stringify(lcd))
         //Insère les lignes
-        const response = await fetch("https://apififa2.azurewebsites.net/api/lignecommande", {
+        try {
+            const response = await fetch("https://apififa2.azurewebsites.net/api/LigneCommande", {
             method: "POST",
             mode: "cors",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(lcd)
-        })
-
-        if (response.status != 201) {
-            console.warn("réponse non gérée " + response.status + "\n" + response)
+          });
+        } catch (error) {
+          console.error('Erreur lors de la requête fetch :', error);
         }
 
         //Baisse le stock
