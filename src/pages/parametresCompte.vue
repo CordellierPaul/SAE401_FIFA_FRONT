@@ -53,6 +53,10 @@ async function fetchCompteData() {
 onMounted(fetchCompteData)
 
 async function enregistrerModifications() {
+    
+    donneesCompte.value.utilisateurCompte.adresseUtilisateur = null
+    
+    console.log(JSON.stringify(donneesCompte.value))
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "PUT",
@@ -143,38 +147,38 @@ async function enregistrerMdp() {
     
     <div>
         <p class="inline">Nom d'utilisateur (login) : </p>
-        <input v-if="modificationCompteEnCours" id="comptelogin" :class="inputClass" v-model="donneesCompte.comptelogin">
-        <p v-else :class="readonlyCompteDataClass" id="comptelogin">{{ donneesCompte.comptelogin }}</p>
+        <input v-if="modificationCompteEnCours" id="champLogin" :class="inputClass" v-model="donneesCompte.comptelogin">
+        <p v-else :class="readonlyCompteDataClass" id="champLogin">{{ donneesCompte.comptelogin }}</p>
     </div>
     <div>
         <p class="inline">Email : </p>
-        <input v-if="modificationCompteEnCours" id="compteEmail" :class="inputClass" v-model="donneesCompte.compteEmail">
-        <p v-else :class="readonlyCompteDataClass" id="compteEmail">{{ donneesCompte.compteEmail }}</p>
+        <input v-if="modificationCompteEnCours" id="champEmail" :class="inputClass" v-model="donneesCompte.compteEmail">
+        <p v-else :class="readonlyCompteDataClass" id="champEmail">{{ donneesCompte.compteEmail }}</p>
     </div>
     <div>
         <p class="inline">Nom : </p>
-        <input v-if="modificationCompteEnCours" id="utilisateurNomAcheteur" :class="inputClass" v-model="donneesCompte.utilisateurCompte.utilisateurNomAcheteur">
-        <p v-else :class="readonlyCompteDataClass" id="utilisateurNomAcheteur">{{ donneesCompte.utilisateurCompte.utilisateurNomAcheteur }}</p>
+        <input v-if="modificationCompteEnCours" id="champNom" :class="inputClass" v-model="donneesCompte.utilisateurCompte.utilisateurNomAcheteur">
+        <p v-else :class="readonlyCompteDataClass" id="champNom">{{ donneesCompte.utilisateurCompte.utilisateurNomAcheteur }}</p>
     </div>
     <div>
         <p class="inline">Prénom : </p>
-        <input v-if="modificationCompteEnCours" id="prenomUtilisateur" :class="inputClass" v-model="donneesCompte.utilisateurCompte.prenomUtilisateur">
-        <p v-else :class="readonlyCompteDataClass" id="prenomUtilisateur">{{ donneesCompte.utilisateurCompte.prenomUtilisateur }}</p>
+        <input v-if="modificationCompteEnCours" id="champPrenom" :class="inputClass" v-model="donneesCompte.utilisateurCompte.prenomUtilisateur">
+        <p v-else :class="readonlyCompteDataClass" id="champPrenom">{{ donneesCompte.utilisateurCompte.prenomUtilisateur }}</p>
     </div>
 
     <div v-if="modificationCompteEnCours">
-        <button :class="basicButtonClass" @click="enregistrerModifications">Enregister</button>
-        <button :class="basicButtonClass" @click="annulerModifications">Annuler</button>
+        <button :class="basicButtonClass" @click="enregistrerModifications" id="btEnregistrerModifCompte">Enregistrer</button>
+        <button :class="basicButtonClass" @click="annulerModifications" id="btAnnulerModifCompte">Annuler</button>
     </div>
     <div v-else>
-        <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="modificationCompteEnCours = true">Modifier le compte</button>
-        <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="popupModificationMdpAffichee = true">Modifier le mot de passe</button>
+        <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="modificationCompteEnCours = true" id="btModifierCompte">Modifier le compte</button>
+        <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="popupModificationMdpAffichee = true" id="btModifierMdp">Modifier le mot de passe</button>
     
         <button :class="basicButtonClass">  <!-- Sans utilisation de <button> le css fait des trucs bizarres -->
             <RouterLink :to="{name: 'donnees-bancaires'}">Modifier mes données bancaires</RouterLink>
         </button>
     
-        <button :class="deleteButtonClass" @click="supprimerCompte">Supprimer le compte</button>
+        <button :class="deleteButtonClass" @click="supprimerCompte" id="btsupprimerCompte">Supprimer le compte</button>
     </div>
 
 </div>
@@ -208,8 +212,8 @@ async function enregistrerMdp() {
             <li :class="stytleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
         </ul>
         <div class="flex items-center justify-center space-x-2">
-            <button :class="basicButtonClass" @click="cacherPopup">Annuler</button>
-            <button :class="basicButtonClass" @click="enregistrerMdp">Enregistrer</button>
+            <button :class="basicButtonClass" @click="cacherPopup" id="btAnnulerModifMdp">Annuler</button>
+            <button :class="basicButtonClass" @click="enregistrerMdp" id="btEnregistrerModifMdp">Enregistrer</button>
         </div>
     </div>
 </div>

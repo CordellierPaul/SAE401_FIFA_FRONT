@@ -82,7 +82,7 @@ function panierPlus(index) {
           <div tabindex="0" role="button" class="btn btn-primary hover:opacity-70 btn-circle avatar">
             <div class="w-10 rounded-full ">
               <div class="avatar placeholder">
-                <div class="bg-accent text-neutral-content rounded-full w-8">
+                <div id="iconeUtilisateur" class="bg-accent text-neutral-content rounded-full w-8">
                   <span class="text-xs">M</span>
                 </div>
               </div>
@@ -96,17 +96,17 @@ function panierPlus(index) {
               </RouterLink>
             </li>
             <li>
-              <RouterLink class="justify-between" :to="{name: 'parametres-compte'}">
+              <RouterLink class="justify-between" :to="{name: 'parametres-compte'}" id="lienVersParametresCompte">
                 Paramètres
               </RouterLink>
             </li>
-            <li><a @click="deconnexion()">Déconnexion</a></li>
+            <li><a @click="deconnexion()" id="btDeconnexion">Déconnexion</a></li>
           </ul>
         </div>
 
         <!-- SI L'UTILISATEUR EST LOGOUT : -->
         <div v-else class="dropdown dropdown-end ml-3">
-          <RouterLink :to="{name: 'login'}">
+          <RouterLink :to="{name: 'login'}" id="iconeConnexion">
             <div tabindex="0" role="button" class="btn btn-primary hover:opacity-70 btn-circle flex justify-center items-center">
               <div class="w-10 rounded-full  flex justify-center items-center">
                 <i class="fa-solid fa-user text-xl text-white"></i>
