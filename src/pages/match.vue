@@ -1,8 +1,23 @@
-<template>
-    {{ match }}
-    {{ match.clubDomicileId }}
+<template >
+    <!-- {{ match }} -->
+    <div class="h-full flex justify-evenly bg-red-200">
 
-    {{ match.matches_joue }}
+        <div>
+            {{ clubDomi.clubNom }}
+        </div>
+
+        <div class="flex gap-3">
+            {{ match.matchScoreDomicile }}
+            <p>-</p>
+            {{ match.matchScoreExterieur }}
+        </div>
+        <div>
+            {{ clubExt.clubNom }}
+
+        </div>
+
+        <!-- {{ match.matches_joue }} -->
+    </div>
     
 </template>
 
