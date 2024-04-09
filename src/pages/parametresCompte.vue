@@ -107,7 +107,26 @@ async function annulerModifications() {
 }
 
 async function supprimerCompte() {
-
+    //anonymisation de l'utilisateur
+    var user = donneesCompte.value.utilisateurCompte
+    user.adresseId = null
+    user.prenomUtilisateur = "X"
+    user.paysFavorisId = null
+    user.utilisateurNomAcheteur = null
+    user.utilisateurTelAcheteur = null
+    user.activiteId = null
+    user.societeId = null
+    user.utilisateurNumTva = null
+    donneesCompte.value.utilisateurCompte = user
+    const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${compteStore.token}`, 
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(donneesCompte.value)
+        })
+    //Suppression du compte
     await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "DELETE",
         headers: {
@@ -205,6 +224,7 @@ async function enregistrerMdp() {
 <template v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
 
     <p class="text-2xl font-semibold">Informations générales :</p>
+    {{ donneesCompte.utilisateurCompte }}
     
     <div>
         <p class="inline">Nom d'utilisateur (login) : </p>
