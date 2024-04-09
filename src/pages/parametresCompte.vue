@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import useCompteStore from "../store/compte.js"
 
 import { verifierMotDePasse, encrypter } from "../composable/hashageMdp.js";
+import { formatEmailEstBon, emailEstDansLaBaseDeDonnees } from "../composable/verificationEmail.js";
 import VerificationMdpComponent from "../components/VerificationMdpComponent.vue";
 import { classesPourListeCondition } from "../components/VerificationMdpComponent.vue";
 
@@ -15,7 +16,6 @@ const donneesCompte = ref()
 const variablesDeVerificationMdp = ref()
 
 const bottonClass = "block text-white hover:bg-white hover:text-black border rounded-lg py-2 px-4 duration-75 my-2"
-
 const deleteButtonClass = bottonClass + " bg-red-500 border-red-500" 
 const basicButtonClass = bottonClass + " bg-gray-500 border-gray-500" 
 
@@ -31,9 +31,35 @@ var donnesPopupModicatMdp = ref({
     verificationNouveauMdp: "",
 })
 
-var stytleConditionMdpChampsVerificationDifferents = ref(classesPourListeCondition["cachee"])
-var stytleConditionMdpUnChampVide = ref(classesPourListeCondition["cachee"])
-var stytleConditionMdpActuelDifferent = ref(classesPourListeCondition["cachee"])
+// Conditions pour le mot de passe
+var styleConditionMdpChampsVerificationDifferents = ref(classesPourListeCondition["cachee"])
+var styleConditionMdpUnChampVide = ref(classesPourListeCondition["cachee"])
+var styleConditionMdpActuelDifferent = ref(classesPourListeCondition["cachee"])
+
+// Conditions pour le reste des données
+var styleConditionEMailMauvaisFormat = ref(classesPourListeCondition["cachee"])
+var styleConditionEMailPasUnique = ref(classesPourListeCondition["cachee"])
+var styleConditionLoginPasRempli = ref(classesPourListeCondition["cachee"])
+var styleConditionNomPasRempli = ref(classesPourListeCondition["cachee"])
+var styleConditionPrenomPasRempli = ref(classesPourListeCondition["cachee"])
+
+function reinitialiserStyleCondition() {
+    let stylesConditions = [
+        styleConditionMdpChampsVerificationDifferents,
+        styleConditionMdpUnChampVide,
+        styleConditionMdpActuelDifferent,
+        styleConditionEMailMauvaisFormat,
+        styleConditionEMailPasUnique,
+        styleConditionLoginPasRempli,
+        styleConditionNomPasRempli,
+        styleConditionPrenomPasRempli
+    ]
+    stylesConditions.forEach(element => {
+        element.value = classesPourListeCondition["cachee"]
+    })
+}
+
+var eMailAvantModification
 
 async function fetchCompteData() {
 
@@ -48,15 +74,15 @@ async function fetchCompteData() {
     donneesCompte.value = await response.json()
 
     donneesCompte.value.utilisateurCompte.utilisateurId = undefined
+
+    eMailAvantModification = donneesCompte.value.compteEmail
 }
 
 onMounted(fetchCompteData)
 
 async function enregistrerModifications() {
     
-    donneesCompte.value.utilisateurCompte.adresseUtilisateur = null
-    
-    console.log(JSON.stringify(donneesCompte.value))
+    donneesCompte.value.utilisateurCompte.adresseUtilisateur = undefined
 
     const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "PUT",
@@ -70,6 +96,8 @@ async function enregistrerModifications() {
     await fetchCompteData()
 
     modificationCompteEnCours.value = false
+
+
 }
 
 async function annulerModifications() {
@@ -92,38 +120,71 @@ async function supprimerCompte() {
     router.push({ "name" : "index" })   
 }
 
+async function enregistrerDonneesCompte() {
+
+    reinitialiserStyleCondition()
+
+    if (eMailAvantModification !== donneesCompte.value.compteEmail) {
+        // Si l'e-mail a été modifié, il faut vérifier l'e-mail a un bon format et ne se trouve pas dans la base de données
+
+        if (!formatEmailEstBon(donneesCompte.value.compteEmail)) {
+            styleConditionEMailMauvaisFormat.value = classesPourListeCondition["pasRespectee"]
+            return
+        }
+
+        if (await emailEstDansLaBaseDeDonnees(donneesCompte.value.compteEmail)) {
+            styleConditionEMailPasUnique.value = classesPourListeCondition["pasRespectee"]
+            return
+        }
+    }
+
+    if (!donneesCompte.value.comptelogin) {
+        styleConditionLoginPasRempli.value = classesPourListeCondition["pasRespectee"]
+        return
+    }
+
+    if (!donneesCompte.value.utilisateurCompte.utilisateurNomAcheteur) {
+        styleConditionNomPasRempli.value = classesPourListeCondition["pasRespectee"]
+        return
+    }
+
+    if (!donneesCompte.value.utilisateurCompte.prenomUtilisateur) {
+        styleConditionPrenomPasRempli.value = classesPourListeCondition["pasRespectee"]
+        return
+    }
+    
+    await enregistrerModifications()
+}
+
 function cacherPopup() {
     // On réinitialise tous les champs todo ?
     donnesPopupModicatMdp.value.mdpActuel = ""
     donnesPopupModicatMdp.value.nouveauMdp = ""
     donnesPopupModicatMdp.value.verificationNouveauMdp = ""
-    stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["cachee"]
-    stytleConditionMdpUnChampVide.value = classesPourListeCondition["cachee"]
-    stytleConditionMdpActuelDifferent.value = classesPourListeCondition["cachee"]
+    
+    reinitialiserStyleCondition()
 
     popupModificationMdpAffichee.value = false
 }
 
 async function enregistrerMdp() {
 
-    stytleConditionMdpUnChampVide.value = classesPourListeCondition["cachee"]
-    stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["cachee"]
-    stytleConditionMdpActuelDifferent.value = classesPourListeCondition["cachee"]
+    reinitialiserStyleCondition()
 
     if (donnesPopupModicatMdp.value.ancienMdp == ""
         || donnesPopupModicatMdp.value.nouveauMdp == ""
         || donnesPopupModicatMdp.value.verificationNouveauMdp == "") {
-        stytleConditionMdpUnChampVide.value = classesPourListeCondition["pasRespectee"]
+        styleConditionMdpUnChampVide.value = classesPourListeCondition["pasRespectee"]
         return
     }
 
     if (donnesPopupModicatMdp.value.nouveauMdp !== donnesPopupModicatMdp.value.verificationNouveauMdp) {
-        stytleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["pasRespectee"]
+        styleConditionMdpChampsVerificationDifferents.value = classesPourListeCondition["pasRespectee"]
         return
     }
 
     if (!verifierMotDePasse(donnesPopupModicatMdp.value.mdpActuel, donneesCompte.value.compteMdp)) {
-        stytleConditionMdpActuelDifferent.value = classesPourListeCondition["pasRespectee"]
+        styleConditionMdpActuelDifferent.value = classesPourListeCondition["pasRespectee"]
         return
     }
 
@@ -167,7 +228,7 @@ async function enregistrerMdp() {
     </div>
 
     <div v-if="modificationCompteEnCours">
-        <button :class="basicButtonClass" @click="enregistrerModifications" id="btEnregistrerModifCompte">Enregistrer</button>
+        <button :class="basicButtonClass" @click="enregistrerDonneesCompte" id="btEnregistrerModifCompte">Enregistrer</button>
         <button :class="basicButtonClass" @click="annulerModifications" id="btAnnulerModifCompte">Annuler</button>
     </div>
     <div v-else>
@@ -180,7 +241,14 @@ async function enregistrerMdp() {
     
         <button :class="deleteButtonClass" @click="supprimerCompte" id="btsupprimerCompte">Supprimer le compte</button>
     </div>
-
+    <!-- Conditions pour modifier le compte -->
+    <ul>
+        <li :class="styleConditionEMailMauvaisFormat">Le format de l'e-mail n'est pas bon</li>
+        <li :class="styleConditionEMailPasUnique">Cet e-mail est déjà dans la base de données</li>
+        <li :class="styleConditionLoginPasRempli">Le login doit être spécifié</li>
+        <li :class="styleConditionNomPasRempli">Le nom doit être spécifié</li>
+        <li :class="styleConditionPrenomPasRempli">Le prenom doit être spécifié</li>
+    </ul>
 </div>
 
 <p v-else class="text-xl mx-auto max-w-7xl px-4 pb-8">Chargement...</p>
@@ -205,11 +273,12 @@ async function enregistrerMdp() {
             <label for="verificationNouveauMdp" class="pr-1">Réécrivez votre nouveau mot de passe :</label>
             <input id="verificationNouveauMdp" v-model="donnesPopupModicatMdp.verificationNouveauMdp" :class="inputClass" type="password">
         </div>
+        <!-- Conditions pour enregistrer le mot de passe -->
         <ul>
             <VerificationMdpComponent :motDePasse="donnesPopupModicatMdp.nouveauMdp" ref="variablesDeVerificationMdp"/>
-            <li :class="stytleConditionMdpChampsVerificationDifferents">Les deux champs de mot de passe sont écrits différemment</li>
-            <li :class="stytleConditionMdpUnChampVide">Un ou plusieurs champs sont vides, ne peux pas continuer</li>
-            <li :class="stytleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
+            <li :class="styleConditionMdpChampsVerificationDifferents">Les deux champs de mot de passe sont écrits différemment</li>
+            <li :class="styleConditionMdpUnChampVide">Un ou plusieurs champs sont vides, ne peux pas continuer</li>
+            <li :class="styleConditionMdpActuelDifferent">Le mot de passe actuel est différent par rapport à celui écrit</li>
         </ul>
         <div class="flex items-center justify-center space-x-2">
             <button :class="basicButtonClass" @click="cacherPopup" id="btAnnulerModifMdp">Annuler</button>
