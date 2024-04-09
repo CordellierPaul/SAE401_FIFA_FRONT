@@ -4,6 +4,10 @@
         
     import { onMounted, ref, watchEffect } from 'vue'
     import { getRequest } from '../composable/httpRequests.js'
+    import { useRoute } from "vue-router";
+
+    const route = useRoute() // important : $route ne fonctionne pas dans la partie script, ce code est obligatoire
+    // route.params.recherche       --> le texte de recherche
 
     const produitsFiltre = ref([])
 
@@ -30,6 +34,7 @@
     let produitsAffiches = ref(10)
 
     async function fetchObjects() {
+
         // pour avoir les tailles
         const tailleResponse = await fetch("https://apififa2.azurewebsites.net/api/taille", {
             method: "GET",
@@ -93,8 +98,6 @@
              paysNom.value.push(pays.paysNom);
              paysId.value.push(pays.paysId);
          });
-
-
     }
 
     onMounted(() => {
