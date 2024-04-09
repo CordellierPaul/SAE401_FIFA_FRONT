@@ -9,8 +9,8 @@
 
 
         <p class="text-xl">Paiement</p>
+        {{ compteStore.utilisateur[0].infosBancairesUtilisateur}}
         <p>Toutes les transactions sont chiffrées et sécurisées.</p>
-        {{ compteStore? compteStore.utilisateur[0]: '' }}
 
         <div class="bg-base-300 p-3 *:my-1 rounded-lg w-full">
             <div class="flex justify-between ">
@@ -25,13 +25,12 @@
                 </div>
             </div>
             <div v-if="compteStore.utilisateur[0].infosBancairesUtilisateur.length >0">
-                {{ compteStore.utilisateur[0].infosBancairesUtilisateur[0] }}
                 <p type="text" class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireNumCarte}}</p>
                 <p type="text" required placeholder="Nom Complet" class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireNomCarte }}</p>
     
                 <div class="flex gap-2">     
-                    <p type="text"  class="input input-bordered w-full " >{{ cb? cb:'' }}</p>
-                    <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireAnneeExpiration }}</p>
+                    <input type="text" required placeholder="Numéro de sécurité (cvv)" pattern="[0-9]{3}" class="input input-bordered w-full " title="Les trois chiffres sur votre carte." v-model="donneesBancaire.keyCVV"/>
+                    <p type="text"  class="input input-bordered w-full " >{{ compteStore.utilisateur[0].infosBancairesUtilisateur[0].InfosBancaireMoisExpiration + "/" + compteStore.utilisateur[0].infosBancairesUtilisateur[0].AnneeExpiration }}</p>
                 </div>
             </div>
             <div v-else>
@@ -107,22 +106,40 @@
 
         <div class="flex gap-2 justify-between mt-2">
             <button @click="btPreviousClick" class="btn w-1/12 bg-secondary text-white"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="btn w-10/12 btn-accent text-white" @click="valideCommande">Payer Maintenant</button>
+            <button class="btn w-10/12 btn-accent text-white" @click="validerPaiement">Payer Maintenant</button>
 
         </div>
 
     </form>
 
+
+    <!-- FENETRE MODAL COMMANDE VALIDER -->
+    <dialog id="modal_commande_valier" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Commande effectuée</h3>
+            <p class="py-4">Félicitation, votre commande à été prise en compte. <br>Retrouver vos commande dans l'onglet "Vos commande" de votre compte. <br><br>
+            Vous allez être rediriger à l'accueil.</p>
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="btn" @click="router.push({ name: 'index' })">Fermer</button>
+            </form>
+          </div>
+        </div>
+    </dialog>
+    
+
 </template>
 
 <script setup>
-import {ref, defineProps} from 'vue'
+import {ref, defineProps, onMounted} from 'vue'
 import usePanierStore from "../../store/panier.js"
+import { useRouter } from 'vue-router';
 import useCompteStore from "../../store/compte.js";
 
-
 const panierStore = usePanierStore()    
-const compteStore = useCompteStore();
+const compteStore = useCompteStore()
+const router = useRouter();
+const donneesCompte = ref()
 const emit = defineEmits(['next','previous'])
 
 const props = defineProps({
@@ -133,6 +150,21 @@ const props = defineProps({
 });
 
 const donneesBancaire = defineModel()
+
+async function fetchCompteData() {
+
+const response = await fetch("https://apififa2.azurewebsites.net/api/compte/getbyid/" + compteStore.compteId, {
+    method: "GET",
+    headers: {
+        "Authorization": `Bearer ${compteStore.token}`,
+        "Content-Type": "application/json",
+    }
+})
+
+donneesCompte.value = await response.json()
+
+}
+onMounted(fetchCompteData)
 
 function btPreviousClick() {
     emit('previous')
@@ -149,9 +181,59 @@ function hideInput(){
 }
 
 
+async function validerPaiement(){
+    if(verifChamps()){
+        await valideCommande()
+        panierStore.reset()
+        modal_commande_valier.showModal();
+    }
+    return;
+}
+
+function verifChamps(){
+    if(compteStore.utilisateur[0].infosBancairesUtilisateur.length === 0){
+        if(!donneesBancaire.value.keyDate){
+            return false
+        }
+        //Vérification de la date
+        let date = new Date()
+        let moisActuelle = (date.getMonth()+1)%12
+        let anneeActuelle = parseInt(date.getFullYear().toString().substring(2))
+        let mmaa = donneesBancaire.value.keyDate.split('/')
+        if(mmaa[1] < anneeActuelle){
+            return false
+        }
+        if(mmaa[1]== anneeActuelle){
+            if(mmaa[0]<moisActuelle)
+                return false
+        }
+        if(donneesBancaire.value.keyNomCarte){
+            //Vérification nom carte
+            if(donneesBancaire.value.keyNomCarte.length <=0)
+                return false;
+        }
+        else
+            return false;
+        if(donneesBancaire.value.keyNumCarte){
+            //Vérification num
+            if(donneesBancaire.value.keyNumCarte.length != 12)
+                return false;
+        }
+        else
+            return false;
+    }    
+    //Vérification du CVV
+    if(!donneesBancaire.value.keyCVV)
+        return false
+    if (donneesBancaire.value.keyCVV.length != 3)
+        return false;
+    return true;
+}
+
 async function valideCommande() {
-    //Récupération des données
     let userNeedUpdate = false;
+
+    //Récupération des données
     const utilisateur = compteStore.utilisateur[0]
     const utilisateurId = compteStore.utilisateur[0].utilisateurId
     const livraisonId = props.livraisons[parseInt(props.livraisonChoisis)].livraisonId
@@ -180,8 +262,6 @@ async function valideCommande() {
         })
 
         if (response.status == 201) {
-
-            // récupération de  l'id de l'adresse ----TODO
             let data = await response.json()
              adresseId = data.adresseId;
              utilisateur.adresseId = adresseId
@@ -192,27 +272,18 @@ async function valideCommande() {
     }
 
     //Mise à jour de l'utilisateur
-    if(props.inscription.value.keyNomAcheteur){
+    if(!utilisateur.utilisateurNomAcheteur){
         userNeedUpdate = true;
-        utilisateur.utilisateurNomAcheteur = props.inscription.value.keyNomAcheteur
+        utilisateur.utilisateurNomAcheteur = props.inscription.keyNomAcheteur
     }
-    if(props.inscription.value.keyTelAcheteur){
+    if(!utilisateur.utilisateurTelAcheteur){
         userNeedUpdate = true;
-        utilisateur.utilisateurTelAcheteur = props.inscription.value.keyTelAcheteur
+        utilisateur.utilisateurTelAcheteur = props.inscription.keyTelAcheteur
     }
-
+    console.log(donneesBancaire.value.keyEnregistre == 1)
+    if(donneesBancaire.value.keyEnregistre == 1)
+        userNeedUpdate = true;
     if(userNeedUpdate){
-        // try {
-        //   const response = await fetch('https://apififa2.azurewebsites.net/api/Utilisateur/'+utilisateur.utilisateurId, {
-        //     method: "PUT",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(utilisateur)
-        //   });
-        // } catch (error) {
-        //   console.error('Erreur lors de la requête fetch :', error);
-        // }
         if(donneesBancaire.value.keyEnregistre == 1){
             let mmaa = donneesBancaire.value.keyDate.split('/') 
             let cb = {
@@ -220,17 +291,33 @@ async function valideCommande() {
                 InfosBancaireNumCarte : donneesBancaire.value.keyNumCarte,
                 InfosBancaireNomCarte : donneesBancaire.value.keyNomCarte,
                 InfosBancaireMoisExpiration : mmaa[0],
-                InfosBancaireAnneeExpiration : mmaa[1],
+                AnneeExpiration : mmaa[1],
             }
-            console.log(utilisateur.infosBancairesUtilisateur.contains(cb))
-            // if(!utilisateur.infosBancairesUtilisateur.contains(cb))
-            //     utilisateur.infosBancairesUtilisateur.push(cb)
+            donneesBancaire.value.keyEnregistre = 0
+            if(!utilisateur.infosBancairesUtilisateur.includes(cb))
+                utilisateur.infosBancairesUtilisateur.unshift(cb)
+            //Ajout de la cb dans la base de données //TODO
+            const response = await fetch("https://apififa2.azurewebsites.net/api/InfosBancaires/", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${compteStore.token}`, 
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cb)
+            })
+
         }
-        console.log(donneesBancaire.value.keyEnregistre)
-        console.log(utilisateur.infosBancairesUtilisateur)
-        console.log(utilisateur)
-        console.log(compteStore.utilisateur[0])
-        compteStore.utilisateur[0] = utilisateur
+        //Mise à jour utilisateur
+        donneesCompte.value.utilisateurCompte = utilisateur
+        compteStore.utilisateur[0] = utilisateur        
+        const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${compteStore.token}`, 
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(donneesCompte.value)
+        })
     }
 
     // Insertion commande
@@ -251,9 +338,7 @@ async function valideCommande() {
         },
         body: JSON.stringify(commande)
     })
-
     if (responseCommande.status == 201) {
-        // récupération de  l'id de la commande ----TODO
         let data = await responseCommande.json()
          commandeId = data.commandeId;
     } else {
@@ -266,8 +351,6 @@ async function valideCommande() {
         ReglementMontant : props.prixCmd,
         ReglementDate : date.toJSON(),
     }
-    
-    // ---- FONCTIONNE
     const response = await fetch("https://apififa2.azurewebsites.net/api/reglement", {
         method: "POST",
         mode: "cors",
@@ -296,7 +379,6 @@ async function valideCommande() {
             LigneCommandeQuantite: quantite,
             LigneCommandePrix: prixligne
         }
-        console.log(JSON.stringify(lcd))
         //Insère les lignes
         try {
             const response = await fetch("https://apififa2.azurewebsites.net/api/LigneCommande", {
@@ -326,7 +408,7 @@ async function valideCommande() {
           console.error('Erreur lors de la requête fetch :', error);
         }
 
-    }      
+    }  
   }
 
 </script>

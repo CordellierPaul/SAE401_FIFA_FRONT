@@ -57,7 +57,14 @@ const usePanierStore = defineStore("panier", {
                 return false
             return true;
         },
-        remise(){
+        reset(){
+            this.nombreProduits = 0
+            this.produits = []
+            this.variantes= []
+            this.stocks = []
+            this.quantites =[]
+            this.images =[]
+            this.coloris = []
             this.prixSousTotal = 0
         }
     },

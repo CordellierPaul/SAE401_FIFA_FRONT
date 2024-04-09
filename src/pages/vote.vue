@@ -11,8 +11,10 @@
     const router = useRouter();
     const route = useRoute();
     const joueurs = ref([]);
+    const votes = ref([]);
     const theme = ref();
     const utilisateur = ref();
+    let dejaVote = false;
 
     async function fetchTheme() {
         try {
@@ -40,12 +42,12 @@
 
     async function fetchJoueurs() {
         try {
-        const responseTheme = await fetch(`https://apififa2.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
+        const responseJoueurs = await fetch(`https://apififa2.azurewebsites.net/api/Theme/GetJoueursByThemeId/${route.query.id}`, {
             method: 'GET',
             mode: 'cors'
         });
 
-        joueurs.value = await responseTheme.json();
+        joueurs.value = await responseJoueurs.json();
 
 
         } catch (error) {
@@ -53,94 +55,129 @@
         }
     }
 
-    //onMounted(fetchTheme);
-    //onMounted(fetchJoueurs);
+
+    async function fetchVotes() {
+        try {
+        const responseVote = await fetch(`https://apififa2.azurewebsites.net/api/Vote`, {
+            method: 'GET',
+            mode: 'cors'
+        });
+
+        votes.value = await responseVote.json();
+
+
+        } catch (error) {
+        console.error('Erreur lors de la récupération des votes :', error);
+        }
+    }
 
     onMounted(async () => {
       await fetchTheme();
       await fetchJoueurs();
+      await fetchVotes();
     })
 
 
     async function voter() {
-      const selectedPlayers = new Set();
-  
-      // Récupérer les joueurs sélectionnés à partir des sélecteurs nommés
-      const joueur1Id = document.querySelector('select[name="joueur1"]').value;
-      const joueur2Id = document.querySelector('select[name="joueur2"]').value;
-      const joueur3Id = document.querySelector('select[name="joueur3"]').value;
 
-      // Vérifier si les joueurs sont sélectionnés
-      if (!joueur1Id || !joueur2Id || !joueur3Id) {
-        my_modal_1.showModal();
-        return;
-      }
+      for(var vote of votes.value){
 
-      // Vérifier si les joueurs sélectionnés sont différents
-      if (joueur1Id === joueur2Id || joueur1Id === joueur3Id || joueur2Id === joueur3Id) {
-        my_modal_1.showModal();
-        return;
-      }
+        console.log(vote.utilisateurId)
+        console.log(compteStore.utilisateur[0].utilisateurId)
+        console.log(vote.themeId)
+        console.log(route.query.id)
 
-      // Ajouter les joueurs sélectionnés à l'ensemble
-      selectedPlayers.add(joueur1Id);
-      selectedPlayers.add(joueur2Id);
-      selectedPlayers.add(joueur3Id);
-
-
-      const userId = parseInt(compteStore.utilisateur[0].utilisateurId,10);
-      //const userId = 17;
-      const themeId = route.query.id;
-      const votes = [];
-
-      // Première itération
-      let vote1 = {
-          utilisateurId: userId,
-          themeId: parseInt(themeId, 10),
-          joueurId: parseInt(joueur1Id, 10),
-          voteNote: 1
-      };
-      votes.push(vote1);
-
-      // Deuxième itération
-      let vote2 = {
-          utilisateurId: userId,
-          themeId: parseInt(themeId, 10),
-          joueurId: parseInt(joueur2Id, 10),
-          voteNote: 2
-      };
-      votes.push(vote2);
-
-      // Troisième itération
-      let vote3 = {
-          utilisateurId: userId,
-          themeId: parseInt(themeId, 10),
-          joueurId: parseInt(joueur3Id, 10),
-          voteNote: 3
-      };
-      votes.push(vote3);
-
-
-      console.log(JSON.stringify(votes));
-
-      for (let vote of votes) {
-        console.log(vote);
-        try {
-          const response = await fetch('https://apififa2.azurewebsites.net/api/Vote', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(vote)
-          });
-          console.log(response)
-          if (!response.ok) {
-            throw new Error('Erreur lors de la requête.');
+          if (
+            vote.utilisateurId === parseInt(compteStore.utilisateur[0].utilisateurId, 10) &&
+            vote.themeId === parseInt(route.query.id, 10)
+          ) {
+            dejaVote = true;
+            break;
           }
-          //alert('Votre vote a été enregistré avec succès.');
-        } catch (error) {
-          console.error('Erreur lors de la requête fetch :', error);
         }
+      console.log(dejaVote)
+
+      if(!dejaVote){
+        const selectedPlayers = new Set();
+    
+        // Récupérer les joueurs sélectionnés à partir des sélecteurs nommés
+        const joueur1Id = document.querySelector('select[name="joueur1"]').value;
+        const joueur2Id = document.querySelector('select[name="joueur2"]').value;
+        const joueur3Id = document.querySelector('select[name="joueur3"]').value;
+
+        // Vérifier si les joueurs sont sélectionnés
+        if (!joueur1Id || !joueur2Id || !joueur3Id) {
+          my_modal_1.showModal();
+          return;
+        }
+
+        // Vérifier si les joueurs sélectionnés sont différents
+        if (joueur1Id === joueur2Id || joueur1Id === joueur3Id || joueur2Id === joueur3Id) {
+          my_modal_1.showModal();
+          return;
+        }
+
+        // Ajouter les joueurs sélectionnés à l'ensemble
+        selectedPlayers.add(joueur1Id);
+        selectedPlayers.add(joueur2Id);
+        selectedPlayers.add(joueur3Id);
+
+
+        const userId = parseInt(compteStore.utilisateur[0].utilisateurId,10);
+        //const userId = 17;
+        const themeId = route.query.id;
+        const votes = [];
+
+        // Première itération
+        let vote1 = {
+            utilisateurId: userId,
+            themeId: parseInt(themeId, 10),
+            joueurId: parseInt(joueur1Id, 10),
+            voteNote: 1
+        };
+        votes.push(vote1);
+
+        // Deuxième itération
+        let vote2 = {
+            utilisateurId: userId,
+            themeId: parseInt(themeId, 10),
+            joueurId: parseInt(joueur2Id, 10),
+            voteNote: 2
+        };
+        votes.push(vote2);
+
+        // Troisième itération
+        let vote3 = {
+            utilisateurId: userId,
+            themeId: parseInt(themeId, 10),
+            joueurId: parseInt(joueur3Id, 10),
+            voteNote: 3
+        };
+        votes.push(vote3);
+
+
+        for (let vote of votes) {
+          try {
+            const response = await fetch('https://apififa2.azurewebsites.net/api/Vote/Ajout', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(vote)
+            });
+
+            console.log(JSON.stringify(vote))
+
+            if (!response.ok) {
+              throw new Error('Erreur lors de la requête.');
+            }
+            //alert('Votre vote a été enregistré avec succès.');
+          } catch (error) {
+            console.error('Erreur lors de la requête fetch :', error);
+          }
+        }
+    }else{
+      my_modal_2.showModal();
     }
   }
 
@@ -219,6 +256,19 @@
         <div class="modal-box">
           <h3 class="font-bold text-lg">Attention!</h3>
           <p class="py-4">Vous devez choisir trois joueurs différents.</p>
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="btn">OK</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- FENETRE MODAL EN CAS DE VOTE DEJA FAIT -->
+      <dialog id="my_modal_2" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">Attention!</h3>
+          <p class="py-4">Vous ne pouvez pas modifier un vote déjà fait.</p>
           <div class="modal-action">
             <form method="dialog">
               <button class="btn">OK</button>

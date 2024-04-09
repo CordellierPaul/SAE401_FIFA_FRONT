@@ -36,12 +36,12 @@
                 <p v-if="VarianteStocks[TailleSelectionner]">{{ VarianteStocks[TailleSelectionner].tailleStockee.tailleLibelle }}</p>
             </div>
             <div id="container" class="flex flex-wrap gap-2 p-2">
-                <template   v-for="(stock, index) in VarianteStocks" :key="index" >
+                <template v-for="(stock, index) in VarianteStocks" :key="index" >
                     <button v-if="stock.varianteProduitId == variantesProduit[variantesSelectionne].varianteProduitId" @click="TailleSelectionner = stock.tailleStockee.tailleId-1"
                     v-bind:class="{'btn btn-square btn-outline flex gap-2' : stock.quantiteStockee !=0, 'btn btn-square btn-outline btn-disabled':stock.quantiteStockee ==0,
                     'btn btn-square btn-accent btn-outline flex gap-2' : TailleSelectionner+1 == stock.tailleStockee.tailleId }">
                         {{ stock.tailleStockee.tailleLibelle }}
-                    </button>               
+                    </button>
                 </template >
             </div>
 

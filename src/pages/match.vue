@@ -1,5 +1,23 @@
-<template>
-    {{ match }}
+<template >
+    <!-- {{ match }} -->
+    <div class="h-full flex justify-evenly bg-red-200">
+
+        <div>
+            {{ clubDomi.clubNom }}
+        </div>
+
+        <div class="flex gap-3">
+            {{ match.matchScoreDomicile }}
+            <p>-</p>
+            {{ match.matchScoreExterieur }}
+        </div>
+        <div>
+            {{ clubExt.clubNom }}
+
+        </div>
+
+        <!-- {{ match.matches_joue }} -->
+    </div>
     
 </template>
 
@@ -16,9 +34,11 @@
 
     async function fetchAll(){
         await getRequest(match, 'https://apififa2.azurewebsites.net/api/match/getbyid/' + matchId);
-        await getRequest(clubExt, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+props.match.clubExterieurId)
-        await getRequest(clubDomi, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+props.match.clubDomicileId)
+        
+        await getRequest(clubExt, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+match.value.clubExterieurId)
+        await getRequest(clubDomi, 'https://apififa2.azurewebsites.net/api/club/getbyid/'+match.value.clubDomicileId)
     }
 
     onMounted(fetchAll)
+
 </script>

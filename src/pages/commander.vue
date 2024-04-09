@@ -122,7 +122,6 @@
             <div class="">
                 <div class="bg-base-200 p-5">
                     <p class="font-semibold">Utiliser un code promo</p>
-                    {{ inscription }}
                     <div class="my-2">
         
                         <p class="text-xs pb-1">Votre code:</p>
