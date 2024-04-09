@@ -18,7 +18,6 @@ motsDePasse.forEach(motDePasse => {
     
     test("test taille de l'encryption : " + motDePasse, () => {
         encryption = encrypter(motDePasse)
-        console.log(encryption);
         expect(motDePasse.length).toBeLessThanOrEqual(128)
     })
 
