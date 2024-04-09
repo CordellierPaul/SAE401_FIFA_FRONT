@@ -202,7 +202,7 @@ async function enregistrerMdp() {
 
 <p class="flex justify-center items-center m-12 text-3xl font-bold">Paramètres du compte</p>
 
-<div v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
+<template v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
 
     <p class="text-2xl font-semibold">Informations générales :</p>
     
@@ -249,9 +249,9 @@ async function enregistrerMdp() {
         <li :class="styleConditionNomPasRempli">Le nom doit être spécifié</li>
         <li :class="styleConditionPrenomPasRempli">Le prenom doit être spécifié</li>
     </ul>
-</div>
+</template>
 
-<p v-else class="text-xl mx-auto max-w-7xl px-4 pb-8">Chargement...</p>
+<template v-else class="text-xl mx-auto max-w-7xl px-4 pb-8">Chargement...</template>
 
 
 <!-- Popup modification mot de passe -->

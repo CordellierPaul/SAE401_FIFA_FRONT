@@ -97,7 +97,7 @@ async function fetchVotes() {
         <template v-if="compteStore.isConnected && dejaVote(theme.themeId)">
             <!-- Déjà Voté -->
             <button class="btn btn-outline btn-primary">
-                Vous ne pouvez plus voter
+                Vous avez déjà voté
             </button>
         </template>
         <template v-if="!compteStore.isConnected">

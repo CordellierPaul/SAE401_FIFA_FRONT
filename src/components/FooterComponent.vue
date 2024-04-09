@@ -1,3 +1,26 @@
+<script setup>
+    import { useRouter } from 'vue-router';
+
+    const router = useRouter();
+
+    function redirectToProduits() {
+        router.push({ name: 'produits' });
+    }
+
+    function redirectToArticles() {
+        router.push({ name: 'articles' });
+    }
+
+    function redirectToContact() {
+        router.push({ name: 'contact' });
+
+    } function redirectToTheme() {
+        router.push({ name: 'theme' });
+    }
+
+</script>
+
+
 <template>
     <div>
         <footer class="footer p-10 bg-primary text-base-content">
@@ -9,20 +32,21 @@
             </aside> 
             <nav>
                 <h6 class="footer-title text-white">Utiles</h6> 
-                <a class="link link-hover text-white">Produits</a>
-                <a class="link link-hover text-white">Articles</a>
+                <a class="link link-hover text-white" @click="redirectToProduits()">Produits</a>
+                <a class="link link-hover text-white" @click="redirectToArticles()">Articles</a>
+                <a class="link link-hover text-white" @click="redirectToTheme()">Votes</a>
             </nav> 
             <nav>
                 <h6 class="footer-title text-white">Entreprise</h6> 
-                <a class="link link-hover text-white">A propos</a>
-                <a class="link link-hover text-white">Contact</a>
+                <!-- <a class="link link-hover text-white">A propos</a> -->
+                <a class="link link-hover text-white" @click="redirectToContact()">Contact</a>
             </nav> 
-            <nav>
+            <!-- <nav>
                 <h6 class="footer-title text-white">Légal</h6> 
                 <a class="link link-hover text-white">Conditions générales de vente</a>
                 <a class="link link-hover text-white">Traitement données personnelles</a>
                 <a class="link link-hover text-white">Gestion des cookies</a>
-            </nav>
+            </nav> -->
             
         </footer>
         <footer class="footer footer-center p-4 bg-primary text-base-content">
