@@ -6,8 +6,8 @@
   const compteStore = useCompteStore();
   const router = useRouter();
   const commandes = ref([]);
-  //const userId = compteStore.utilisateur[0].utilisateurId
-  const userId = 5
+  const userId = compteStore.utilisateur[0].utilisateurId
+  //const userId = 5
 
     async function fetchCommandes() {
         try {
