@@ -7,6 +7,7 @@ const motsDePasse = [
     "@afrzejgoi\/:hzeuifh//",
     "huifrhgiurhejezhil",
     "GiganteSQUEMotDDePase\fiuhg\i46546846487443sqd",
+    "GiganfdsfezfotDDePase\fiuhg\i4654684648fezfezfzGiganteSQUEefzefzefezf7443sqd",
     "jeo89/rel\\sd\fgu\rzei",
     "hfiez"
 ]
