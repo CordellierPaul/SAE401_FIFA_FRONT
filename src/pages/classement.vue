@@ -1,51 +1,110 @@
 <template>
-    <div>
-        <p>Classement</p>
+    <div v-if="match.length > 0">
+        <p class="text-2xl font-bold flex items-center justify-center m-10">Classement</p>
 
+        <div class="overflow-x-auto">
+            <table class="table table-zebra">
+                <!-- head -->
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Club</th>
+                    <th>Victoires</th>
+                    <th>Défaites</th>
+                    <th>Winrate (%)</th>
+                    <th>Buts Pour</th>
+                    <th>Buts Contre</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(club, index) in classement" :key="club.clubId">
+                        <td>{{ index + 1 }}</td>
+                        <td class="font-bold">{{ getClubName(club.clubId) }}</td>
+                        <td>{{ club.wins }}</td>
+                        <td>{{ club.losses }}</td>
+                        <td>{{ calculateWinrate(club.wins, club.losses) }}</td>
+                        <td>{{ club.goalsFor }}</td>
+                        <td>{{ club.goalsAgainst }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div v-else class="flex justify-center items-center h-screen">
+        <span class="loading loading-spinner loading-lg"></span>
     </div>
 </template>
 
 <script setup>
-import { getRequest } from "@/composable/httpRequests"
-import { onMounted, ref } from "vue"
+    import { getRequest } from "@/composable/httpRequests"
+    import { onMounted, ref } from "vue"
 
-const match = ref([])
-const classement = ref([])
+    const match = ref([])
+    const classement = ref([])
+    const clubs = ref([])
+    const clubNames = {};
 
-async function fetchAll(){
-    await getRequest(match, "https://apififa2.azurewebsites.net/api/match/")
-    classer();
-}
+    async function fetchAll(){
+        await getRequest(match, "https://apififa2.azurewebsites.net/api/match/")
+        await getRequest(clubs, "https://apififa2.azurewebsites.net/api/club/")
+        classer();
+    }
 
-function classer(){
-    const clubs = {};
-    match.value.forEach(match => {
-        if (!clubs[match.clubDomicileId]) clubs[match.clubDomicileId] = { clubId: match.clubDomicileId, wins: 0, scored: 0 };
-        if (!clubs[match.clubExterieurId]) clubs[match.clubExterieurId] = { clubId: match.clubExterieurId, wins: 0, scored: 0 };
+    function classer(){
 
-        if (match.matchScoreDomicile > match.matchScoreExterieur) {
-            clubs[match.clubDomicileId].wins++;
-        } else if (match.matchScoreDomicile < match.matchScoreExterieur) {
-            clubs[match.clubExterieurId].wins++;
-        }
-        
-        // Mise à jour du score marqué
-        clubs[match.clubDomicileId].scored += match.matchScoreDomicile;
-        clubs[match.clubExterieurId].scored += match.matchScoreExterieur;
-    });
+        // Map des identifiants de club aux noms des clubs
+        clubs.value.forEach(club => {
+            clubNames[club.clubId] = club.clubNom;
+        });
 
-    // Convertir l'objet en tableau pour le tri
-    const sortedClubs = Object.values(clubs).sort((a, b) => {
-        // Si le nombre de victoires est égal, comparer le score marqué
-        if (a.wins === b.wins) {
-            return b.scored - a.scored; // Tri décroissant du score marqué
-        } else {
-            return b.wins - a.wins; // Tri décroissant du nombre de victoires
-        }
-    });
+        const clubsStats = {};
 
-    classement.value = sortedClubs;
-}
+        match.value.forEach(match => {
+            if (!clubsStats[match.clubDomicileId]) clubsStats[match.clubDomicileId] = { clubId: match.clubDomicileId, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+            if (!clubsStats[match.clubExterieurId]) clubsStats[match.clubExterieurId] = { clubId: match.clubExterieurId, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
 
-onMounted(fetchAll)
+            if (match.matchScoreDomicile > match.matchScoreExterieur) {
+                clubsStats[match.clubDomicileId].wins++;
+                clubsStats[match.clubExterieurId].losses++;
+            } else if (match.matchScoreDomicile < match.matchScoreExterieur) {
+                clubsStats[match.clubDomicileId].losses++;
+                clubsStats[match.clubExterieurId].wins++;
+            }
+            
+            // Mise à jour des buts pour et contre
+            clubsStats[match.clubDomicileId].goalsFor += match.matchScoreDomicile;
+            clubsStats[match.clubDomicileId].goalsAgainst += match.matchScoreExterieur;
+            clubsStats[match.clubExterieurId].goalsFor += match.matchScoreExterieur;
+            clubsStats[match.clubExterieurId].goalsAgainst += match.matchScoreDomicile;
+        });
+
+        // Convertir l'objet en tableau pour le tri
+        const sortedClubs = Object.values(clubsStats).sort((a, b) => {
+            // Comparaison des victoires
+            if (a.wins !== b.wins) return b.wins - a.wins;
+            
+            // Comparaison des différences de buts
+            const diffGoalsA = a.goalsFor - a.goalsAgainst;
+            const diffGoalsB = b.goalsFor - b.goalsAgainst;
+            if (diffGoalsA !== diffGoalsB) return diffGoalsB - diffGoalsA;
+            
+            // Comparaison des buts marqués
+            return b.goalsFor - a.goalsFor;
+        });
+
+        classement.value = sortedClubs;
+
+        // Fonction pour obtenir le nom du club à partir de son ID
+    }
+
+    const getClubName = (clubId) => {
+        return clubNames[clubId] || `Club ${clubId}`; // Si le nom du club n'est pas trouvé, utilisez "Club (numéro)"
+    }
+    const calculateWinrate = (wins, losses) => {
+        const totalMatches = wins + losses;
+        if (totalMatches === 0) return 0; // Pour éviter une division par zéro
+        return ((wins / totalMatches) * 100).toFixed(2); // Renvoie le pourcentage arrondi à 2 décimales
+    }
+
+    onMounted(fetchAll)
 </script>
