@@ -235,9 +235,9 @@ async function enregistrerMdp() {
         <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="modificationCompteEnCours = true" id="btModifierCompte">Modifier le compte</button>
         <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="popupModificationMdpAffichee = true" id="btModifierMdp">Modifier le mot de passe</button>
     
-        <button :class="basicButtonClass">  <!-- Sans utilisation de <button> le css fait des trucs bizarres -->
+        <!-- <button :class="basicButtonClass">     ! Sans utilisation de <button> le css fait des trucs bizarres
             <RouterLink :to="{name: 'donnees-bancaires'}">Modifier mes données bancaires</RouterLink>
-        </button>
+        </button> -->
     
         <button :class="deleteButtonClass" @click="supprimerCompte" id="btsupprimerCompte">Supprimer le compte</button>
     </div>

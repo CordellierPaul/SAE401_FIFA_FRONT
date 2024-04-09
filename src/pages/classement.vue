@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="match.length > 0">
         <p class="text-2xl font-bold flex items-center justify-center m-10">Classement</p>
 
         <div class="overflow-x-auto">
@@ -29,6 +29,9 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div v-else class="flex justify-center items-center h-screen">
+        <span class="loading loading-spinner loading-lg"></span>
     </div>
 </template>
 
