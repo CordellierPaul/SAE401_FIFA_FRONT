@@ -1,5 +1,3 @@
-// Test d'inscription, de connexion, de modification et de suppression du compte
-
 function genererStringAleatoire() {
   return Math.random().toString(36).slice(-5);
 }
@@ -21,7 +19,7 @@ const compteApresModif = genererCompte()
 
 const nouveauMotDePasse = genererStringAleatoire() + genererStringAleatoire() + "1!A"
 
-describe("Test où un compte est créé, on se déconnecte, se connecte, et supprimer le compte", () => {
+describe("Test où un compte est créé, on modifie toutes ses données (même le mot de passe), on se déconnecte, on se connecte, on supprime le compte", () => {
     it("Inscription", () => {
       cy.visit('/register')
 
