@@ -76,7 +76,9 @@ async function boutonCreationCompte() {
         lesConditionsSontRemplies = false
     } 
 
-    if (compte.value.dateDeNaissance != "") {
+    
+
+    if (compte.value.dateDeNaissance != "" && estVampire(compte.value.dateDeNaissance)) {
         styleConditionDateNaissanceReseigne.value = classesPourListeCondition["cachee"]
     } else {
         styleConditionDateNaissanceReseigne.value = classesPourListeCondition["pasRespectee"]
@@ -86,6 +88,8 @@ async function boutonCreationCompte() {
     if (!lesConditionsSontRemplies) {
         return
     }
+
+    console.log(compte.value.dateDeNaissance)
 
     let dateDeNaissance = new Date(compte.value.dateDeNaissance)
 
@@ -146,6 +150,19 @@ async function boutonCreationCompte() {
         console.warn("réponse non gérée " + response.status + "\n" + response)
     }
 }
+
+    function estVampire(datenaiss){
+        let dateDeNaissance = new Date(datenaiss);
+        let dateAujourdhui = new Date();
+        let dateLimite = new Date(dateAujourdhui.getFullYear() - 100, dateAujourdhui.getMonth(), dateAujourdhui.getDate());
+
+        if(dateDeNaissance < dateLimite)
+            return false;
+        else
+            return true;
+    }
+
+
 </script>
 
 <template>
