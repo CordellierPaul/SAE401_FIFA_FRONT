@@ -62,7 +62,7 @@ onMounted(fetchProductImagePath)
                     id: id
                 }}">
       <figure class="relative h-96 flex flex-col">
-        <img v-if="image" :src="image" alt="Image du produit" class="  hover:grayscale hover:brightness-50" />
+        <img v-if="image" :src="'/~sa13/' + image" alt="Image du produit" class="  hover:grayscale hover:brightness-50" />
         <div class="card-body h-1/2 bottom-0 w-full absolute bg-neutral-400/90 ">
           <p class="bg-accent h-fit w-fit flex justify-center items-center px-2 py-1 rounded-full  text-white">NOUVEAU</p>
           <h2 class="card-title text-white"  v-if="produit">{{produit.produitNom}}</h2>
