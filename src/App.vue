@@ -15,7 +15,6 @@ import CookieComponent from './components/CookiesComponent.vue'
     
     <FooterComponent class="sticky top-[100vh]"></FooterComponent>
 
-    <CookieComponent></CookieComponent>
   </div>
 </template>
 
