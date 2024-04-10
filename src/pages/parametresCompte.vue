@@ -224,7 +224,6 @@ async function enregistrerMdp() {
 <template v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
 
     <p class="text-2xl font-semibold">Informations générales :</p>
-    {{ donneesCompte.utilisateurCompte }}
     
     <div>
         <p class="inline">Nom d'utilisateur (login) : </p>
