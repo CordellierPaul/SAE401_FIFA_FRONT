@@ -12,6 +12,6 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  }//,
-  // base: "/~sa13/"
+  },
+  base: "http://51.83.36.122/~sa13/"
 })
