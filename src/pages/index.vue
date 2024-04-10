@@ -3,8 +3,8 @@
 
 <template>
   <div>
-    <div class="min-h-screen flex items-center justify-center">
-      <h1>Bienvenue</h1>
+    <div class="min-h-screen ">
+      <img class="w-full" src="https://lh4.googleusercontent.com/proxy/Qs2atmXD8SzD7TKGM-aG90mR9hWI9dkC1BEyBFHXD-buZ2vYIrxgapRP48vFylKplu1wX-rFoCGDH5uWTYluIaPWPDzFeMsaiN7BjfQTPZBxWTqtBsoTvIkztxiXkfl__XDxgZqGlcwuao-TMQYykk4NO5Ezq92e" alt="">
     </div>
   </div>
 </template>
