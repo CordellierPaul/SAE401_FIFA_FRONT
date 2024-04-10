@@ -13,5 +13,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: "http://51.83.36.122/~sa13/"
+  base: "/~sa13/"
 })
