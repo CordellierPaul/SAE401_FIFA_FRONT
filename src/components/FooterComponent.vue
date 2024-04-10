@@ -35,6 +35,8 @@
                 <a class="link link-hover text-white" @click="redirectToProduits()">Produits</a>
                 <a class="link link-hover text-white" @click="redirectToArticles()">Articles</a>
                 <a class="link link-hover text-white" @click="redirectToTheme()">Votes</a>
+                <RouterLink class="link link-hover text-white" :to="{name: 'classement'}">Classement</RouterLink>
+                <RouterLink class="link link-hover text-white" :to="{name: 'theme'}">Voter pour un theme</RouterLink>
             </nav> 
             <nav>
                 <h6 class="footer-title text-white">Entreprise</h6> 
