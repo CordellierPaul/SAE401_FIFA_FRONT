@@ -4,6 +4,10 @@
         
     import { onMounted, ref, watchEffect } from 'vue'
     import { getRequest } from '../composable/httpRequests.js'
+    import { useRoute } from "vue-router";
+
+    const route = useRoute() // important : $route ne fonctionne pas dans la partie script, ce code est obligatoire
+    // route.params.recherche       --> le texte de recherche
 
     const produitsFiltre = ref([])
 
@@ -27,28 +31,10 @@
 
     const ordprix = ref(null);
 
-
-    // FILTRE PETIT FENETRE
-    // const filtres = [
-    //     { titre: 'Taille' },
-    //     { titre: 'Genre' },
-    //     { titre: 'Coloris' },
-    //     { titre: 'Categorie' },
-    //     { titre: 'Pays' }
-    // ];
-
-    // const selectedFilter = ref(null);
-    // const selectedOption = ref(null);
-
-    // function getOptions(filter) {
-    //     const selected = filtres.find(filtre => filtre.titre === filter);
-    //     return selected ? selected.options : [];
-    // }
-
-    // pour récupérer tous les produits
-
+    let produitsAffiches = ref(10)
 
     async function fetchObjects() {
+
         // pour avoir les tailles
         const tailleResponse = await fetch("https://apififa2.azurewebsites.net/api/taille", {
             method: "GET",
@@ -57,6 +43,7 @@
         
         tailles.value = await tailleResponse.json()
         
+
         tailles.value.forEach(taille => {
             taillesLibelle.value.push(taille.tailleLibelle);
         });
@@ -111,17 +98,12 @@
              paysNom.value.push(pays.paysNom);
              paysId.value.push(pays.paysId);
          });
-
-
     }
 
     onMounted(() => {
         fetchObjects(); 
 
-        console.log(ordprix.value); 
-
         if (ordprix.value) {
-        // Ajoutez un écouteur d'événement change une fois que l'élément select est rendu dans le DOM
         ordprix.value.addEventListener('change', (event) => {
             trierProduits(event);
         });
@@ -173,7 +155,7 @@
         });
 
         fetchProduitsFiltres(filtreRequestStr.value);
-
+        produitsAffiches = ref(10)
 
     },{
         deep: true
@@ -181,7 +163,6 @@
 
     watchEffect(() => {
         const triParPrix = document.querySelector('#ordprix');
-        console.log(triParPrix)
         if (triParPrix) {
             console.log("hehe")
             triParPrix.addEventListener('change', (event) => {
@@ -198,6 +179,8 @@
         
         produitsFiltre.value = await Response.json()
 
+        console.log(produitsFiltre.value)
+
     }
 
     function compare(a, b) {
@@ -211,8 +194,6 @@
     }
     
     function trierProduits(event) {
-        console.log("Trier les produits en fonction de l'option sélectionnée :", event.target.value);
-
         const ordre = event.target.value;
 
         if (ordre === 'croissant') {
@@ -225,8 +206,6 @@
                 }
             });
             
-            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
-            console.log(produitsFiltre.value);
             
         } else if (ordre === 'decroissant') {
             // par ordre décroissant du prix
@@ -238,14 +217,16 @@
                 }
             });
             
-            console.log(produitsFiltre.value[0].variantesProduit[0].varianteProduitPrix); 
-            console.log(produitsFiltre.value);
         } else if (ordre === 'defaut') {
             // par ordre croissant du produitId
             produitsFiltre.value.sort((a, b) => {
                 return a.produitId - b.produitId;
             });
         }
+    }
+
+    function chargerPlusProduits() {
+        produitsAffiches.value += 10;
     }
 
 </script>
@@ -260,23 +241,9 @@
             </ul>
         </div>
 
-            <!-- <select class="select select-primary w-full max-w-xs lg:hidden">
-                <option selected>Filtrer par</option>
-                <select>
-                    <option>
-                        <FiltreComponent v-model:optionsChecked="optionsTaillesChecked" v-if="taillesLibelle" :filtreData="{ titre: 'Taille', options: taillesLibelle }" />
-                    </option>
-                </select>
-                <select><FiltreComponent v-model:optionsChecked="optionsGenresChecked" v-if="genresNom" :filtreData="{ titre: 'Genre', options: genresNom }" /></select>
-                <select><FiltreComponent v-model:optionsChecked="optionsColorisChecked" v-if="colorisNom" :filtreData="{ titre: 'Coloris', options: colorisNom }" /></select>
-                <select><FiltreComponent v-model:optionsChecked="optionsCategoriesChecked" v-if="categoriesNom" :filtreData="{ titre: 'Categorie', options: categoriesNom }" /></select>
-                <select><FiltreComponent v-model:optionsChecked="optionsPaysChecked" v-if="paysNom" :filtreData="{ titre: 'Pays', options: paysNom }" /></select>
-            </select> -->
-
             <template v-if="selectedFilter">
             <select v-model="selectedOption" class="select select-primary w-full max-w-xs lg:hidden">
                 <option selected disabled>Choisir {{ selectedFilter }}</option>
-                <!-- Ajout des options pour le filtre sélectionné -->
                 <option v-for="option in getOptions(selectedFilter)" :key="option">{{ option }}</option>
             </select>
         </template>
@@ -323,7 +290,10 @@
 
                 <div id="container" class="flex flex-wrap items-center justify-center gap-10 p-2">
                     <template v-if="produitsFiltre.length > 0">
-                        <ProduitComponent v-for="produit in produitsFiltre" :key="produit.produitId" :id="produit.produitId" :nom="produit.produitNom" />
+                        <ProduitComponent v-for="produit in produitsFiltre.slice(0, produitsAffiches)" :key="produit.produitId" :id="produit.produitId" :nom="produit.produitNom" />
+                        <div v-if="produitsFiltre.length > produitsAffiches" class="m-10 flex items-center justify-center">
+                            <button class="btn btn-primary text-white" @click="chargerPlusProduits">Voir plus</button>
+                        </div>
                     </template>
                     <template v-else>
                         <div class="text-gray-500">Aucun produit trouvé.</div>
@@ -332,9 +302,7 @@
 
 
 
-                <div class="m-10 flex items-center justify-center">
-                    <button class="btn btn-primary text-white">Voir plus</button>
-                </div>
+               
             </div>
         </div>
     </div>

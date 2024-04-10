@@ -7,6 +7,7 @@ const motsDePasse = [
     "@afrzejgoi\/:hzeuifh//",
     "huifrhgiurhejezhil",
     "GiganteSQUEMotDDePase\fiuhg\i46546846487443sqd",
+    "GiganfdsfezfotDDePase\fiuhg\i4654684648fezfezfzGiganteSQUEefzefzefezf7443sqd",
     "jeo89/rel\\sd\fgu\rzei",
     "hfiez"
 ]
@@ -17,7 +18,6 @@ motsDePasse.forEach(motDePasse => {
     
     test("test taille de l'encryption : " + motDePasse, () => {
         encryption = encrypter(motDePasse)
-        console.log(encryption);
         expect(motDePasse.length).toBeLessThanOrEqual(128)
     })
 

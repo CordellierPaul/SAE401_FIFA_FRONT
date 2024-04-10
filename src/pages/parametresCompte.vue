@@ -107,7 +107,26 @@ async function annulerModifications() {
 }
 
 async function supprimerCompte() {
-
+    //anonymisation de l'utilisateur
+    var user = donneesCompte.value.utilisateurCompte
+    user.adresseId = null
+    user.prenomUtilisateur = "X"
+    user.paysFavorisId = null
+    user.utilisateurNomAcheteur = null
+    user.utilisateurTelAcheteur = null
+    user.activiteId = null
+    user.societeId = null
+    user.utilisateurNumTva = null
+    donneesCompte.value.utilisateurCompte = user
+    const response = await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${compteStore.token}`, 
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(donneesCompte.value)
+        })
+    //Suppression du compte
     await fetch("https://apififa2.azurewebsites.net/api/compte/" + compteStore.compteId, {
         method: "DELETE",
         headers: {
@@ -202,7 +221,7 @@ async function enregistrerMdp() {
 
 <p class="flex justify-center items-center m-12 text-3xl font-bold">Paramètres du compte</p>
 
-<div v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
+<template v-if="donneesCompte" class="container mx-auto max-w-7xl px-4 pb-8">
 
     <p class="text-2xl font-semibold">Informations générales :</p>
     
@@ -235,9 +254,9 @@ async function enregistrerMdp() {
         <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="modificationCompteEnCours = true" id="btModifierCompte">Modifier le compte</button>
         <button v-if="!modificationCompteEnCours" :class="basicButtonClass" @click="popupModificationMdpAffichee = true" id="btModifierMdp">Modifier le mot de passe</button>
     
-        <button :class="basicButtonClass">  <!-- Sans utilisation de <button> le css fait des trucs bizarres -->
+        <!-- <button :class="basicButtonClass">     ! Sans utilisation de <button> le css fait des trucs bizarres
             <RouterLink :to="{name: 'donnees-bancaires'}">Modifier mes données bancaires</RouterLink>
-        </button>
+        </button> -->
     
         <button :class="deleteButtonClass" @click="supprimerCompte" id="btsupprimerCompte">Supprimer le compte</button>
     </div>
@@ -249,9 +268,9 @@ async function enregistrerMdp() {
         <li :class="styleConditionNomPasRempli">Le nom doit être spécifié</li>
         <li :class="styleConditionPrenomPasRempli">Le prenom doit être spécifié</li>
     </ul>
-</div>
+</template>
 
-<p v-else class="text-xl mx-auto max-w-7xl px-4 pb-8">Chargement...</p>
+<template v-else class="text-xl mx-auto max-w-7xl px-4 pb-8">Chargement...</template>
 
 
 <!-- Popup modification mot de passe -->

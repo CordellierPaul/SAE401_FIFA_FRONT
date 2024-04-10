@@ -9,22 +9,31 @@
                 <tr>
                     <th></th>
                     <th>Club</th>
+                    <th>Joué</th>
                     <th>Victoires</th>
+                    <th>Égalité</th>
                     <th>Défaites</th>
-                    <th>Winrate (%)</th>
-                    <th>Buts Pour</th>
-                    <th>Buts Contre</th>
+                    <th>Pourcentage de victoire (%)</th>
+                    <th>BP/BC</th>
+                    <th>+/-</th>
+                    <th>B/M</th>
+                    <th>PTS</th>
                 </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(club, index) in classement" :key="club.clubId">
                         <td>{{ index + 1 }}</td>
                         <td class="font-bold">{{ getClubName(club.clubId) }}</td>
+                        <td>{{ club.wins + club.draw + club.losses}}</td>
                         <td>{{ club.wins }}</td>
+                        <td>{{ club.draw }}</td>
                         <td>{{ club.losses }}</td>
-                        <td>{{ calculateWinrate(club.wins, club.losses) }}</td>
-                        <td>{{ club.goalsFor }}</td>
-                        <td>{{ club.goalsAgainst }}</td>
+                        <td>{{ calculateWinrate(club.wins, club.losses, club.draw) }}</td>
+                        <td>{{ club.goalsFor }}:{{ club.goalsAgainst }}</td>
+                        <td>{{ club.goalsFor - club.goalsAgainst }}</td>
+                        <td>{{ calculateGoalPerMatch(club.wins, club.losses, club.draw, club.goalsFor) }}</td>
+                        <td class="font-bold">{{ club.points }}</td>
+                        
                     </tr>
                 </tbody>
             </table>
@@ -60,15 +69,22 @@
         const clubsStats = {};
 
         match.value.forEach(match => {
-            if (!clubsStats[match.clubDomicileId]) clubsStats[match.clubDomicileId] = { clubId: match.clubDomicileId, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
-            if (!clubsStats[match.clubExterieurId]) clubsStats[match.clubExterieurId] = { clubId: match.clubExterieurId, wins: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 };
+            if (!clubsStats[match.clubDomicileId]) clubsStats[match.clubDomicileId] = { clubId: match.clubDomicileId, wins: 0, draw: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, points: 0, };
+            if (!clubsStats[match.clubExterieurId]) clubsStats[match.clubExterieurId] = { clubId: match.clubExterieurId, wins: 0, draw: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, points: 0, };
 
             if (match.matchScoreDomicile > match.matchScoreExterieur) {
                 clubsStats[match.clubDomicileId].wins++;
+                clubsStats[match.clubDomicileId].points = clubsStats[match.clubDomicileId].points +3;
                 clubsStats[match.clubExterieurId].losses++;
             } else if (match.matchScoreDomicile < match.matchScoreExterieur) {
                 clubsStats[match.clubDomicileId].losses++;
                 clubsStats[match.clubExterieurId].wins++;
+                clubsStats[match.clubExterieurId].points = clubsStats[match.clubExterieurId].points +3;
+            }else{
+                clubsStats[match.clubDomicileId].draw++;
+                clubsStats[match.clubExterieurId].draw++;
+                clubsStats[match.clubDomicileId].points++;
+                clubsStats[match.clubExterieurId].points++;
             }
             
             // Mise à jour des buts pour et contre
@@ -80,8 +96,8 @@
 
         // Convertir l'objet en tableau pour le tri
         const sortedClubs = Object.values(clubsStats).sort((a, b) => {
-            // Comparaison des victoires
-            if (a.wins !== b.wins) return b.wins - a.wins;
+            // Comparaison des points
+            if (a.points !== b.points) return b.points - a.points;
             
             // Comparaison des différences de buts
             const diffGoalsA = a.goalsFor - a.goalsAgainst;
@@ -100,11 +116,18 @@
     const getClubName = (clubId) => {
         return clubNames[clubId] || `Club ${clubId}`; // Si le nom du club n'est pas trouvé, utilisez "Club (numéro)"
     }
-    const calculateWinrate = (wins, losses) => {
-        const totalMatches = wins + losses;
+    const calculateWinrate = (wins, losses, draw) => {
+        const totalMatches = wins + losses + draw;
         if (totalMatches === 0) return 0; // Pour éviter une division par zéro
         return ((wins / totalMatches) * 100).toFixed(2); // Renvoie le pourcentage arrondi à 2 décimales
     }
+
+    const calculateGoalPerMatch = (wins, losses, draw, goalsFor) => {
+        const totalMatches = wins + losses + draw;
+        if (totalMatches === 0) return 0; // Pour éviter une division par zéro
+        return ((goalsFor / totalMatches)).toFixed(2); // Renvoie le pourcentage arrondi à 2 décimales
+    }
+
 
     onMounted(fetchAll)
 </script>

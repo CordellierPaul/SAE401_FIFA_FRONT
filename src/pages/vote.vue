@@ -66,26 +66,12 @@
         votes.value = await responseVote.json();
 
 
-        } catch (error) {
-        console.error('Erreur lors de la récupération des votes :', error);
-        }
-    }
+        for(var vote of votes.value){
 
-    onMounted(async () => {
-      await fetchTheme();
-      await fetchJoueurs();
-      await fetchVotes();
-    })
-
-
-    async function voter() {
-
-      for(var vote of votes.value){
-
-        console.log(vote.utilisateurId)
-        console.log(compteStore.utilisateur[0].utilisateurId)
-        console.log(vote.themeId)
-        console.log(route.query.id)
+          console.log(vote.utilisateurId)
+          console.log(compteStore.utilisateur[0].utilisateurId)
+          console.log(vote.themeId)
+          console.log(route.query.id)
 
           if (
             vote.utilisateurId === parseInt(compteStore.utilisateur[0].utilisateurId, 10) &&
@@ -94,9 +80,25 @@
             dejaVote = true;
             break;
           }
-        }
-      console.log(dejaVote)
 
+        }
+        console.log(dejaVote)
+
+        } catch (error) {
+        console.error('Erreur lors de la récupération des votes :', error);
+        }
+
+       
+    }
+
+    onMounted(async () => {
+      await fetchTheme();
+      await fetchJoueurs();
+      await fetchVotes();
+    })
+
+    async function voter() {
+      
       if(!dejaVote){
         const selectedPlayers = new Set();
     
@@ -176,6 +178,8 @@
             console.error('Erreur lors de la requête fetch :', error);
           }
         }
+
+        dejaVote = true;
     }else{
       my_modal_2.showModal();
     }
@@ -184,32 +188,35 @@
 </script>
 
 <template>
-<template v-if="compteStore.isConnected">
-    
-  <div class="sticky top-20 z-[5] bg-secondary p-4 flex  items-center text-white min-h-20" >
 
-      <!-- Liens entre les pages -->
-      <div class="text-sm breadcrumbs hidden lg:block">
-          <ul>
-              <li><RouterLink :to="{name: 'index'}" class="hover:opacity-50 hover:cursor-pointer">FIFA</RouterLink></li> 
-              <li><a @click= "retour"  class="hover:opacity-50 hover:cursor-pointer">Thèmes</a></li> 
-              <!-- Titre de la page actuelle -->
-              <li>{{ theme ? theme.themeLibelle : '' }}</li>
-          </ul>
-      </div>
+  <div class="sticky top-20 z-[5] bg-secondary p-4 flex  items-center text-white min-h-20" >
+    <!-- Liens entre les pages -->
+    <div class="text-sm breadcrumbs hidden lg:block">
+        <ul>
+            <li><RouterLink :to="{name: 'index'}" class="hover:opacity-50 hover:cursor-pointer">FIFA</RouterLink></li> 
+            <li><a @click= "retour"  class="hover:opacity-50 hover:cursor-pointer">Thèmes</a></li> 
+            <!-- Titre de la page actuelle -->
+            <li>{{ theme ? theme.themeLibelle : '' }}</li>
+        </ul>
+    </div>
   </div>
 
-    <div>
-      <!-- Affichage des joueurs -->
-      <h1 class="flex justify-center items-center m-12 text-3xl font-bold">Liste des joueurs</h1>
-      <div class="grid grid-cols-3 gap-4 place-content-stretch ">
-        <div v-for="joueur in joueurs" :id="joueur.joueurId" class="card w-96 bg-base-100 shadow-xl gap-4">
-          <h2 class="card-title">{{ joueur.joueurNom, joueur.joueurPrenom }}</h2>
-          <p>Poids : {{ joueur.joueurPoids }}</p>
-          <p>Taille : {{ joueur.joueurTaille }}</p>
-          <p>{{ joueur.joueurDescription }}</p>
-        </div>
+  <div>
+    <!-- Affichage des joueurs -->
+    <h1 class="flex justify-center items-center m-12 text-3xl font-bold">Liste des joueurs</h1>
+    <div class="grid grid-cols-3 gap-4 place-content-stretch ">
+      <div v-for="joueur in joueurs" :id="joueur.joueurId" class="card w-96 bg-base-100 shadow-xl gap-4">
+        <h2 class="card-title">{{ joueur.joueurNom, joueur.joueurPrenom }}</h2>
+        <p>Poids : {{ joueur.joueurPoids }}</p>
+        <p>Taille : {{ joueur.joueurTaille }}</p>
+        <p>{{ joueur.joueurDescription }}</p>
       </div>
+    </div>
+  </div>
+
+<template v-if="!dejaVote">
+
+  <div>
 
       <!-- Selects -->
       <div class="grid grid-cols-3 gap-4 place-content-stretch m-12">
@@ -283,7 +290,7 @@
   </template>
   <template v-else>
     <!-- Utilisateur non connecté -->
-    <p>Connectez-vous pour voter</p>
+    <p>Vous ne pouvez plus voter</p>
   </template>
   </template>
 
