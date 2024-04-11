@@ -17,7 +17,7 @@
     <div class="flex ">
         <div  class=" flex justify-center items-center bg-base-200  lg:block w-1/2 p-2 mr-1">
   
-            <img v-if="image" :src="image" alt="">
+            <img v-if="'/~sa13/' + image" :src="image" alt="">
 
         </div>
 
